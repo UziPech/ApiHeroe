@@ -101,10 +101,10 @@
   <h1>Superhéroes API Frontend</h1>
   <div class="container">
     <div class="list">
-      <h2>Héroes</h2>
-      <ul id="heroes-list"></ul>
-      <h2>Villanos</h2>
-      <ul id="villains-list"></ul>
+      <h2>Personajes</h2>
+      <div id="personajes-tabs" style="margin-bottom:1em;"></div>
+      <div id="personajes-list"></div>
+      <div id="personaje-detail"></div>
     </div>
     <div class="form">
       <h2>Crear Batalla</h2>
@@ -124,6 +124,7 @@
         </label>
         <button type="submit">Crear Duelo</button>
       </form>
+      <div id="duel-result"></div>
       <form id="battle-form-team" style="display: none;">
         <label>Selecciona Héroes:
           <select id="heroes-select" multiple size="5"></select>
@@ -141,8 +142,13 @@
       </form>
     </div>
     <div class="battles">
-      <h2>Batallas</h2>
-      <div id="battles-list"></div>
+      <h2>Batallas en curso</h2>
+      <div id="en-curso-tabs" style="margin-bottom:1em;"></div>
+      <div id="en-curso-content"></div>
+      <hr style="margin:2em 0;">
+      <h2 style="color:#888;font-size:1.1em;">Batallas finalizadas</h2>
+      <div id="finalizadas-tabs" style="margin-bottom:1em;"></div>
+      <div id="finalizadas-content"></div>
     </div>
   </div>
   <script src="main.js"></script>

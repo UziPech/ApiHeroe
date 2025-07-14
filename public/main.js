@@ -17,50 +17,46 @@ async function loadHeroesAndVillains() {
   HEROES_CACHE = heroes;
   VILLAINS_CACHE = villains;
 
-  // Listas para el formulario de equipos
-  const heroesList = document.getElementById('heroes-list');
-  const villainsList = document.getElementById('villains-list');
+  // Llenar selects y listas para el formulario de batallas (como antes)
   const heroesSelect = document.getElementById('heroes-select');
   const villainsSelect = document.getElementById('villains-select');
-  // Selects para el formulario individual
   const heroSelectIndividual = document.getElementById('hero-select-individual');
   const villainSelectIndividual = document.getElementById('villain-select-individual');
-
-  heroesList.innerHTML = '';
-  villainsList.innerHTML = '';
-  heroesSelect.innerHTML = '';
-  villainsSelect.innerHTML = '';
-  heroSelectIndividual.innerHTML = '';
-  villainSelectIndividual.innerHTML = '';
-
+  if (heroesSelect) heroesSelect.innerHTML = '';
+  if (villainsSelect) villainsSelect.innerHTML = '';
+  if (heroSelectIndividual) heroSelectIndividual.innerHTML = '';
+  if (villainSelectIndividual) villainSelectIndividual.innerHTML = '';
   heroes.forEach(hero => {
-    const li = document.createElement('li');
-    li.textContent = hero.alias || hero.name;
-    heroesList.appendChild(li);
-    const option = document.createElement('option');
-    option.value = hero.id;
-    option.textContent = hero.alias || hero.name;
-    heroesSelect.appendChild(option);
-    // Para individual
-    const optionInd = document.createElement('option');
-    optionInd.value = hero.id;
-    optionInd.textContent = hero.alias || hero.name;
-    heroSelectIndividual.appendChild(optionInd);
+    if (heroesSelect) {
+      const option = document.createElement('option');
+      option.value = hero.id;
+      option.textContent = hero.alias || hero.name;
+      heroesSelect.appendChild(option);
+    }
+    if (heroSelectIndividual) {
+      const optionInd = document.createElement('option');
+      optionInd.value = hero.id;
+      optionInd.textContent = hero.alias || hero.name;
+      heroSelectIndividual.appendChild(optionInd);
+    }
   });
   villains.forEach(villain => {
-    const li = document.createElement('li');
-    li.textContent = villain.alias || villain.name;
-    villainsList.appendChild(li);
-    const option = document.createElement('option');
-    option.value = villain.id;
-    option.textContent = villain.alias || villain.name;
-    villainsSelect.appendChild(option);
-    // Para individual
-    const optionInd = document.createElement('option');
-    optionInd.value = villain.id;
-    optionInd.textContent = villain.alias || villain.name;
-    villainSelectIndividual.appendChild(optionInd);
+    if (villainsSelect) {
+      const option = document.createElement('option');
+      option.value = villain.id;
+      option.textContent = villain.alias || villain.name;
+      villainsSelect.appendChild(option);
+    }
+    if (villainSelectIndividual) {
+      const optionInd = document.createElement('option');
+      optionInd.value = villain.id;
+      optionInd.textContent = villain.alias || villain.name;
+      villainSelectIndividual.appendChild(optionInd);
+    }
   });
+
+  // Renderizar tabs de personajes
+  renderPersonajesTabs(heroes, villains);
 }
 
 // Cambiar tipo de batalla
@@ -76,6 +72,8 @@ async function createBattleIndividual(e) {
   e.preventDefault();
   const heroId = document.getElementById('hero-select-individual').value;
   const villainId = document.getElementById('villain-select-individual').value;
+  const resultDiv = document.getElementById('duel-result');
+  if (resultDiv) resultDiv.innerHTML = '';
   if (!heroId || !villainId) {
     alert('Selecciona un héroe y un villano.');
     return;
@@ -84,7 +82,19 @@ async function createBattleIndividual(e) {
     method: 'POST'
   });
   if (res.ok) {
-    alert('¡Duelo creado!');
+    const data = await res.json();
+    let msg = `<div style='margin-top:1em;padding:1em;background:#eafbe7;border-radius:8px;border:1px solid #b2e2b2;'>`;
+    msg += `<strong>¡Duelo finalizado!</strong><br>`;
+    if (data.winner && data.loser) {
+      msg += `Ganador: <span style='color:#2a7;font-weight:bold;'>${data.winner.alias || data.winner.name || data.winner.id}</span><br>`;
+      msg += `Perdedor: <span style='color:#a22;'>${data.loser.alias || data.loser.name || data.loser.id}</span><br>`;
+    } else if (data.winner) {
+      msg += `Ganador: <span style='color:#2a7;font-weight:bold;'>${data.winner.alias || data.winner.name || data.winner.id}</span><br>`;
+    } else {
+      msg += `No se pudo determinar el ganador.`;
+    }
+    msg += `</div>`;
+    if (resultDiv) resultDiv.innerHTML = msg;
     loadBattles();
   } else {
     const error = await res.json().catch(() => ({}));
@@ -253,8 +263,14 @@ async function showBattleDetails(battleId, container) {
         body: JSON.stringify({ attacker, defender })
       });
       if (res.ok) {
-        showBattleDetails(battleId, container);
-        loadBattles();
+        // Mantener el detalle abierto y actualizado
+        await showBattleDetails(battleId, container);
+        // Solo recargar la lista si la batalla terminó
+        const battleRes = await fetch(`/api/battle/${battleId}`);
+        const battleData = await battleRes.json();
+        if (battleData.finished || (battleData.winner && (!battleData.teams || !battleData.teams.heroes || !battleData.teams.villains))) {
+          loadBattles();
+        }
       } else {
         const error = await res.json().catch(() => ({}));
         alert('Error al atacar: ' + (error.error || res.statusText));
@@ -263,78 +279,263 @@ async function showBattleDetails(battleId, container) {
   }
 }
 
-// Listar batallas
-async function loadBattles() {
-  const res = await fetch('/api/battles');
-  const battles = await res.json();
-  const battlesList = document.getElementById('battles-list');
-  battlesList.innerHTML = '';
-  // Separar batallas en curso y finalizadas
-  const ongoing = battles.filter(b => !b.finished);
-  const finished = battles.filter(b => b.finished);
-  // Mostrar primero la batalla en curso más reciente
-  if (ongoing.length > 0) {
-    const battle = ongoing[ongoing.length-1];
-    const div = document.createElement('div');
-    div.className = 'battle';
-    let heroes = '-';
-    let villains = '-';
-    if (battle.teams && battle.teams.heroes && battle.teams.villains) {
-      // Mostrar alias en vez de nombre
-      heroes = battle.teams.heroes.map(h => getAliasById(h.id, HEROES_CACHE)).join(', ');
-      villains = battle.teams.villains.map(v => getAliasById(v.id, VILLAINS_CACHE)).join(', ');
-    } else if (battle.hero && battle.villain) {
-      heroes = getAliasById(battle.hero.id || battle.hero, HEROES_CACHE);
-      villains = getAliasById(battle.villain.id || battle.villain, VILLAINS_CACHE);
+// Mostrar batallas finalizadas con tabs
+function renderFinalizadasTabs(finishedIndividual, finishedTeam) {
+  const tabsDiv = document.getElementById('finalizadas-tabs');
+  const contentDiv = document.getElementById('finalizadas-content');
+  if (!tabsDiv || !contentDiv) return;
+  tabsDiv.innerHTML = '';
+  contentDiv.innerHTML = '';
+  // Crear botones
+  const btnInd = document.createElement('button');
+  btnInd.textContent = `Individuales (${finishedIndividual.length})`;
+  btnInd.style.marginRight = '1em';
+  btnInd.className = 'tab-btn';
+  const btnTeam = document.createElement('button');
+  btnTeam.textContent = `Por equipos (${finishedTeam.length})`;
+  btnTeam.className = 'tab-btn';
+  tabsDiv.appendChild(btnInd);
+  tabsDiv.appendChild(btnTeam);
+  // Renderizar lista de botones
+  function renderList(type) {
+    contentDiv.innerHTML = '';
+    let list = type === 'individual' ? finishedIndividual : finishedTeam;
+    if (list.length === 0) {
+      contentDiv.innerHTML = '<div style="color:#888;">No hay batallas finalizadas de este tipo.</div>';
+      return;
     }
-    div.innerHTML = `<strong>ID:</strong> ${battle.id || '-'}<br>
-      <strong>Héroes:</strong> ${heroes}<br>
-      <strong>Villanos:</strong> ${villains}<br>
-      <strong>Turno:</strong> ${battle.turn || '-'}<br>
-      <strong>Estado:</strong> <span style='color:#2a7;'>En curso</span><br>
-      <strong>Ganador:</strong> ${(battle.winner && battle.winner.alias) ? battle.winner.alias : (battle.winner && battle.winner.name) ? battle.winner.name : (battle.winner || '-')}`;
-    const btn = document.createElement('button');
-    btn.textContent = 'Ver detalles';
-    btn.style.marginTop = '0.7em';
-    btn.onclick = () => {
-      showBattleDetails(battle.id, div);
-    };
-    div.appendChild(btn);
-    battlesList.appendChild(div);
-  }
-  // Mostrar batallas finalizadas
-  if (finished.length > 0) {
-    const sep = document.createElement('div');
-    sep.innerHTML = '<hr style="margin:2em 0;"> <h2 style="color:#888;font-size:1.1em;">Batallas finalizadas</h2>';
-    battlesList.appendChild(sep);
-    finished.reverse().forEach(battle => {
+    list.slice().reverse().forEach(battle => {
       const div = document.createElement('div');
       div.className = 'battle';
       let heroes = '-';
       let villains = '-';
-      if (battle.teams && battle.teams.heroes && battle.teams.villains) {
-        heroes = battle.teams.heroes.map(h => getAliasById(h.id, HEROES_CACHE)).join(', ');
-        villains = battle.teams.villains.map(v => getAliasById(v.id, VILLAINS_CACHE)).join(', ');
-      } else if (battle.hero && battle.villain) {
+      if (type === 'individual') {
         heroes = getAliasById(battle.hero.id || battle.hero, HEROES_CACHE);
         villains = getAliasById(battle.villain.id || battle.villain, VILLAINS_CACHE);
+      } else {
+        heroes = battle.teams.heroes.map(h => getAliasById(h.id, HEROES_CACHE)).join(', ');
+        villains = battle.teams.villains.map(v => getAliasById(v.id, VILLAINS_CACHE)).join(', ');
       }
       div.innerHTML = `<strong>ID:</strong> ${battle.id || '-'}<br>
         <strong>Héroes:</strong> ${heroes}<br>
-        <strong>Villanos:</strong> ${villains}<br>
-        <strong>Turno:</strong> ${battle.turn || '-'}<br>
-        <strong>Estado:</strong> <span style='color:#a22;'>Finalizada</span><br>
-        <strong>Ganador:</strong> ${(battle.winner && battle.winner.alias) ? battle.winner.alias : (battle.winner && battle.winner.name) ? battle.winner.name : (battle.winner || '-')}`;
+        <strong>Villanos:</strong> ${villains}<br>`;
       const btn = document.createElement('button');
       btn.textContent = 'Ver detalles';
       btn.style.marginTop = '0.7em';
       btn.onclick = () => {
+        // Mostrar detalles al hacer clic
+        if (div.querySelector('.battle-details')) {
+          div.querySelector('.battle-details').remove();
+          return;
+        }
+        // Ocultar otros detalles abiertos
+        contentDiv.querySelectorAll('.battle-details').forEach(el => el.remove());
+        // Mostrar detalles
+        let detailsDiv = document.createElement('div');
+        detailsDiv.className = 'battle-details';
+        detailsDiv.style.marginTop = '1em';
+        detailsDiv.style.background = '#f8fafc';
+        detailsDiv.style.borderRadius = '8px';
+        detailsDiv.style.padding = '1em';
+        detailsDiv.innerHTML = `<strong>Turno:</strong> ${battle.turn || '-'}<br>
+          <strong>Estado:</strong> <span style='color:#a22;'>Finalizada</span><br>
+          <strong>Ganador:</strong> ${(battle.winner && battle.winner.alias) ? battle.winner.alias : (battle.winner && battle.winner.name) ? battle.winner.name : (battle.winner || '-')}`;
+        div.appendChild(detailsDiv);
+        // Mostrar historial de acciones si existen
+        if (battle.actions && battle.actions.length > 0) {
+          let actionsHtml = '<strong>Acciones:</strong><ul>';
+          battle.actions.forEach((a, i) => {
+            let desc = `Turno ${a.turn || i+1}: `;
+            if (a.attacker && a.defender) {
+              const attackerName = getAliasById(a.attacker, HEROES_CACHE.concat(VILLAINS_CACHE));
+              const defenderName = getAliasById(a.defender, HEROES_CACHE.concat(VILLAINS_CACHE));
+              desc += `${attackerName} atacó a ${defenderName}`;
+              if (a.type) desc += ` con un ataque ${a.type}`;
+              if (a.damage) desc += `. Daño: ${a.damage}`;
+              if (a.remainingHP !== undefined) desc += `. HP restante del defensor: ${a.remainingHP}`;
+            } else {
+              desc += JSON.stringify(a);
+            }
+            actionsHtml += `<li>${desc}</li>`;
+          });
+          actionsHtml += '</ul>';
+          detailsDiv.innerHTML += actionsHtml;
+        }
+      };
+      div.appendChild(btn);
+      contentDiv.appendChild(div);
+    });
+  }
+  // Eventos
+  btnInd.onclick = () => {
+    btnInd.className = 'tab-btn active';
+    btnTeam.className = 'tab-btn';
+    renderList('individual');
+  };
+  btnTeam.onclick = () => {
+    btnInd.className = 'tab-btn';
+    btnTeam.className = 'tab-btn active';
+    renderList('team');
+  };
+  // No mostrar ninguna lista por defecto
+}
+
+function renderEnCursoTabs(ongoingIndividual, ongoingTeam) {
+  const tabsDiv = document.getElementById('en-curso-tabs');
+  const contentDiv = document.getElementById('en-curso-content');
+  if (!tabsDiv || !contentDiv) return;
+  tabsDiv.innerHTML = '';
+  contentDiv.innerHTML = '';
+  // Crear botones
+  const btnInd = document.createElement('button');
+  btnInd.textContent = `Individuales (${ongoingIndividual.length})`;
+  btnInd.style.marginRight = '1em';
+  btnInd.className = 'tab-btn';
+  const btnTeam = document.createElement('button');
+  btnTeam.textContent = `Por equipos (${ongoingTeam.length})`;
+  btnTeam.className = 'tab-btn';
+  tabsDiv.appendChild(btnInd);
+  tabsDiv.appendChild(btnTeam);
+  // Renderizar lista de botones
+  function renderList(type) {
+    contentDiv.innerHTML = '';
+    let list = type === 'individual' ? ongoingIndividual : ongoingTeam;
+    if (list.length === 0) {
+      contentDiv.innerHTML = '<div style="color:#888;">No hay batallas en curso de este tipo.</div>';
+      return;
+    }
+    list.slice().reverse().forEach(battle => {
+      const div = document.createElement('div');
+      div.className = 'battle';
+      let heroes = '-';
+      let villains = '-';
+      if (type === 'individual') {
+        heroes = getAliasById(battle.hero.id || battle.hero, HEROES_CACHE);
+        villains = getAliasById(battle.villain.id || battle.villain, VILLAINS_CACHE);
+      } else {
+        heroes = battle.teams.heroes.map(h => getAliasById(h.id, HEROES_CACHE)).join(', ');
+        villains = battle.teams.villains.map(v => getAliasById(v.id, VILLAINS_CACHE)).join(', ');
+      }
+      div.innerHTML = `<strong>ID:</strong> ${battle.id || '-'}<br>
+        <strong>Héroes:</strong> ${heroes}<br>
+        <strong>Villanos:</strong> ${villains}<br>`;
+      const btn = document.createElement('button');
+      btn.textContent = 'Ver detalles';
+      btn.style.marginTop = '0.7em';
+      btn.onclick = () => {
+        // Mostrar detalles interactivos al hacer clic
+        if (div.querySelector('.battle-details')) {
+          div.querySelector('.battle-details').remove();
+          return;
+        }
+        // Ocultar otros detalles abiertos
+        contentDiv.querySelectorAll('.battle-details').forEach(el => el.remove());
+        // Usar el mismo detalle interactivo que en la vista principal
         showBattleDetails(battle.id, div);
       };
       div.appendChild(btn);
-      battlesList.appendChild(div);
+      contentDiv.appendChild(div);
     });
   }
+  // Eventos
+  btnInd.onclick = () => {
+    btnInd.className = 'tab-btn active';
+    btnTeam.className = 'tab-btn';
+    renderList('individual');
+  };
+  btnTeam.onclick = () => {
+    btnInd.className = 'tab-btn';
+    btnTeam.className = 'tab-btn active';
+    renderList('team');
+  };
+  // No mostrar ninguna lista por defecto
+}
+
+function renderPersonajesTabs(heroes, villains) {
+  const tabsDiv = document.getElementById('personajes-tabs');
+  const listDiv = document.getElementById('personajes-list');
+  const detailDiv = document.getElementById('personaje-detail');
+  if (!tabsDiv || !listDiv || !detailDiv) return;
+  tabsDiv.innerHTML = '';
+  listDiv.innerHTML = '';
+  detailDiv.innerHTML = '';
+  // Crear botones
+  const btnHeroes = document.createElement('button');
+  btnHeroes.textContent = `Héroes (${heroes.length})`;
+  btnHeroes.style.marginRight = '1em';
+  btnHeroes.className = 'tab-btn active';
+  const btnVillains = document.createElement('button');
+  btnVillains.textContent = `Villanos (${villains.length})`;
+  btnVillains.className = 'tab-btn';
+  tabsDiv.appendChild(btnHeroes);
+  tabsDiv.appendChild(btnVillains);
+  // Renderizar lista
+  function renderList(type) {
+    listDiv.innerHTML = '';
+    detailDiv.innerHTML = '';
+    let list = type === 'heroes' ? heroes : villains;
+    if (list.length === 0) {
+      listDiv.innerHTML = '<div style="color:#888;">No hay personajes de este tipo.</div>';
+      return;
+    }
+    const ul = document.createElement('ul');
+    list.forEach(personaje => {
+      const li = document.createElement('li');
+      li.textContent = personaje.alias || personaje.name;
+      li.style.cursor = 'pointer';
+      li.onclick = () => {
+        // Mostrar/ocultar detalles
+        if (detailDiv.innerHTML && detailDiv.dataset.id == personaje.id) {
+          detailDiv.innerHTML = '';
+          detailDiv.dataset.id = '';
+          return;
+        }
+        detailDiv.innerHTML = `<div style='background:#f8fafc;padding:1em;border-radius:8px;margin-top:0.5em;box-shadow:0 1px 6px rgba(60,60,100,0.06);'>
+          <strong>Alias:</strong> ${personaje.alias || '-'}<br>
+          <strong>Nombre:</strong> ${personaje.name || '-'}<br>
+          <strong>Ciudad:</strong> ${personaje.city || '-'}<br>
+          <strong>Equipo:</strong> ${personaje.team || '-'}<br>
+          <strong>Poder:</strong> ${personaje.power !== undefined ? personaje.power : '-'}
+        </div>`;
+        detailDiv.dataset.id = personaje.id;
+      };
+      ul.appendChild(li);
+    });
+    listDiv.appendChild(ul);
+  }
+  // Eventos
+  btnHeroes.onclick = () => {
+    btnHeroes.className = 'tab-btn active';
+    btnVillains.className = 'tab-btn';
+    renderList('heroes');
+  };
+  btnVillains.onclick = () => {
+    btnHeroes.className = 'tab-btn';
+    btnVillains.className = 'tab-btn active';
+    renderList('villains');
+  };
+  // Mostrar héroes por defecto
+  renderList('heroes');
+}
+
+// Listar batallas
+async function loadBattles() {
+  const res = await fetch('/api/battles');
+  const battles = await res.json();
+  // Separar batallas en curso y finalizadas
+  const ongoing = battles.filter(b => !b.finished && !b.winner);
+  // Subdividir en curso en individuales y equipos
+  const ongoingIndividual = ongoing.filter(b => b.hero && b.villain);
+  const ongoingTeam = ongoing.filter(b => b.teams && b.teams.heroes && b.teams.villains);
+  // Considerar finalizadas las que tienen winner aunque no tengan finished
+  const finished = battles.filter(b => b.finished || (b.winner && (!b.teams || !b.teams.heroes || !b.teams.villains)));
+  // Subdividir finalizadas en individuales y equipos
+  const finishedIndividual = finished.filter(b => b.hero && b.villain);
+  const finishedTeam = finished.filter(b => b.teams && b.teams.heroes && b.teams.villains);
+  // Mostrar batallas en curso con tabs
+  renderEnCursoTabs(ongoingIndividual, ongoingTeam);
+  // Mostrar batallas finalizadas con tabs
+  renderFinalizadasTabs(finishedIndividual, finishedTeam);
 }
 
 document.getElementById('battle-form-individual').addEventListener('submit', createBattleIndividual);
@@ -342,4 +543,10 @@ document.getElementById('battle-form-team').addEventListener('submit', createBat
 
 // Inicializar
 loadHeroesAndVillains();
-loadBattles(); 
+loadBattles();
+
+// Agregar estilos para los botones de tabs
+const style = document.createElement('style');
+style.innerHTML = `.tab-btn { padding: 0.5em 1.2em; border: none; border-radius: 6px 6px 0 0; background: #e0e4ea; color: #222; font-weight: 600; cursor: pointer; margin-right: 0.5em; transition: background 0.2s; }
+.tab-btn.active { background: #4f8cff; color: #fff; }`;
+document.head.appendChild(style); 
