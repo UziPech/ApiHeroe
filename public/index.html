@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Superhéroes API Frontend</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      background: #f4f6fb;
+      min-height: 100vh;
+    }
+    h1 {
+      color: #222a36;
+      margin-top: 0;
+      margin-bottom: 1.5em;
+      letter-spacing: 1px;
+    }
+    h2 {
+      color: #3b4a5a;
+      margin-bottom: 1em;
+      font-size: 1.2em;
+      border-bottom: 1px solid #e0e4ea;
+      padding-bottom: 0.3em;
+    }
+    .container {
+      display: flex;
+      gap: 2em;
+      justify-content: center;
+      align-items: flex-start;
+      margin: 2em auto;
+      max-width: 1200px;
+    }
+    .list, .form, .battles {
+      flex: 1;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(60,60,100,0.08);
+      padding: 2em 1.5em 1.5em 1.5em;
+      min-width: 250px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1em 0;
+    }
+    li {
+      margin-bottom: 0.5em;
+      color: #2c3e50;
+      font-size: 1em;
+    }
+    label {
+      display: block;
+      margin-top: 1em;
+      color: #3b4a5a;
+      font-weight: 500;
+    }
+    select, button {
+      margin-top: 0.5em;
+      padding: 0.5em 0.7em;
+      border-radius: 6px;
+      border: 1px solid #cfd8dc;
+      font-size: 1em;
+      background: #f8fafc;
+      transition: border 0.2s;
+    }
+    select:focus, button:focus {
+      outline: none;
+      border: 1.5px solid #4f8cff;
+    }
+    button {
+      background: linear-gradient(90deg, #4f8cff 0%, #6ed0fa 100%);
+      color: #fff;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(79,140,255,0.08);
+      margin-top: 1.5em;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: linear-gradient(90deg, #357ae8 0%, #4fc3f7 100%);
+    }
+    .battle {
+      border: 1px solid #e0e4ea;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 1em;
+      margin-bottom: 1em;
+      box-shadow: 0 1px 6px rgba(60,60,100,0.06);
+      font-size: 0.98em;
+    }
+    @media (max-width: 900px) {
+      .container { flex-direction: column; gap: 1em; }
+      .list, .form, .battles { min-width: unset; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Superhéroes API Frontend</h1>
+  <div class="container">
+    <div class="list">
+      <h2>Héroes</h2>
+      <ul id="heroes-list"></ul>
+      <h2>Villanos</h2>
+      <ul id="villains-list"></ul>
+    </div>
+    <div class="form">
+      <h2>Crear Batalla</h2>
+      <p style="font-size:0.95em;color:#888;margin-bottom:0.5em;">* Los nombres mostrados son de ejemplo. Los resultados dependen de la estructura de la API.</p>
+      <label>Tipo de batalla:
+        <select id="battle-type">
+          <option value="individual">Individual (1 vs 1)</option>
+          <option value="equipo">Por equipos</option>
+        </select>
+      </label>
+      <form id="battle-form-individual" style="display: block;">
+        <label>Selecciona Héroe:
+          <select id="hero-select-individual"></select>
+        </label>
+        <label>Selecciona Villano:
+          <select id="villain-select-individual"></select>
+        </label>
+        <button type="submit">Crear Duelo</button>
+      </form>
+      <form id="battle-form-team" style="display: none;">
+        <label>Selecciona Héroes:
+          <select id="heroes-select" multiple size="5"></select>
+        </label>
+        <label>Selecciona Villanos:
+          <select id="villains-select" multiple size="5"></select>
+        </label>
+        <label>Tu Lado:
+          <select id="user-side">
+            <option value="heroes">Héroes</option>
+            <option value="villains">Villanos</option>
+          </select>
+        </label>
+        <button type="submit">Crear Batalla por Equipos</button>
+      </form>
+    </div>
+    <div class="battles">
+      <h2>Batallas</h2>
+      <div id="battles-list"></div>
+    </div>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html> 
