@@ -126,14 +126,29 @@ router.get('/battles/:battleId', async (req, res) => {
  *                 type: integer
  *               firstVillain:
  *                 type: integer
+ *               heroConfig:
+ *                 type: object
+ *                 description: Configuración personalizada de niveles y defensa para héroes
+ *               villainConfig:
+ *                 type: object
+ *                 description: Configuración personalizada de niveles y defensa para villanos
+
  *     responses:
  *       201:
  *         description: Batalla creada
  */
 router.post('/battle/team', async (req, res) => {
   try {
-    const { heroes, villains, userSide, firstHero, firstVillain } = req.body;
-    const battle = await battleService.createTeamBattle({ heroes, villains, userSide, firstHero, firstVillain });
+    const { heroes, villains, userSide, firstHero, firstVillain, heroConfig, villainConfig } = req.body;
+    const battle = await battleService.createTeamBattle({ 
+      heroes, 
+      villains, 
+      userSide, 
+      firstHero, 
+      firstVillain,
+      heroConfig,
+      villainConfig
+    });
     res.status(201).json(battle);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -164,6 +179,10 @@ router.post('/battle/team', async (req, res) => {
  *                 type: integer
  *               defender:
  *                 type: integer
+ *               attackType:
+ *                 type: string
+ *                 enum: [basico, especial, critico]
+ *                 description: Tipo de ataque a realizar (Básico, Especial, Crítico)
  *     responses:
  *       200:
  *         description: Acción realizada
@@ -171,8 +190,8 @@ router.post('/battle/team', async (req, res) => {
 router.post('/battle/:id/attack', async (req, res) => {
   try {
     const { id } = req.params;
-    const { attacker, defender } = req.body;
-    const battle = await battleService.teamAttack(Number(id), attacker, defender);
+    const { attacker, defender, attackType } = req.body;
+    const battle = await battleService.teamAttack(Number(id), attacker, defender, attackType);
     res.status(200).json(battle);
   } catch (error) {
     res.status(400).json({ error: error.message });

@@ -102,28 +102,130 @@ async function createBattleIndividual(e) {
   }
 }
 
+// Función para validar configuración de personajes
+function validateCharacterConfig() {
+  const heroes = Array.from(document.getElementById('heroes-select').selectedOptions).map(opt => opt.value);
+  const villains = Array.from(document.getElementById('villains-select').selectedOptions).map(opt => opt.value);
+  
+  // Validar héroes seleccionados
+  for (const heroId of heroes) {
+    const levelInput = document.getElementById(`hero-level-${heroId}`);
+    const defenseInput = document.getElementById(`hero-defense-${heroId}`);
+    
+    if (levelInput && defenseInput) {
+      const level = parseInt(levelInput.value);
+      const defense = parseInt(defenseInput.value);
+      
+      if (level < 1 || level > 3) {
+        alert(`Nivel del héroe debe estar entre 1 y 3`);
+        return false;
+      }
+      
+      if (defense < 0 || defense > 50) {
+        alert(`Defensa del héroe debe estar entre 0 y 50`);
+        return false;
+      }
+    }
+  }
+  
+  // Validar villanos seleccionados
+  for (const villainId of villains) {
+    const levelInput = document.getElementById(`villain-level-${villainId}`);
+    const defenseInput = document.getElementById(`villain-defense-${villainId}`);
+    
+    if (levelInput && defenseInput) {
+      const level = parseInt(levelInput.value);
+      const defense = parseInt(defenseInput.value);
+      
+      if (level < 1 || level > 3) {
+        alert(`Nivel del villano debe estar entre 1 y 3`);
+        return false;
+      }
+      
+      if (defense < 0 || defense > 50) {
+        alert(`Defensa del villano debe estar entre 0 y 50`);
+        return false;
+      }
+    }
+  }
+  
+
+  
+  return true;
+}
+
+// Función para obtener configuración de personajes
+function getCharacterConfig() {
+  const heroes = Array.from(document.getElementById('heroes-select').selectedOptions).map(opt => opt.value);
+  const villains = Array.from(document.getElementById('villains-select').selectedOptions).map(opt => opt.value);
+  
+  const heroConfig = {};
+  const villainConfig = {};
+  
+  // Obtener configuración de héroes
+  heroes.forEach(heroId => {
+    const levelInput = document.getElementById(`hero-level-${heroId}`);
+    const defenseInput = document.getElementById(`hero-defense-${heroId}`);
+    
+    if (levelInput && defenseInput) {
+      heroConfig[heroId] = {
+        level: parseInt(levelInput.value),
+        defense: parseInt(defenseInput.value)
+      };
+    }
+  });
+  
+  // Obtener configuración de villanos
+  villains.forEach(villainId => {
+    const levelInput = document.getElementById(`villain-level-${villainId}`);
+    const defenseInput = document.getElementById(`villain-defense-${villainId}`);
+    
+    if (levelInput && defenseInput) {
+      villainConfig[villainId] = {
+        level: parseInt(levelInput.value),
+        defense: parseInt(defenseInput.value)
+      };
+    }
+  });
+  
+  return { heroConfig, villainConfig };
+}
+
 // Crear batalla por equipos
 async function createBattleTeam(e) {
   e.preventDefault();
   const heroes = Array.from(document.getElementById('heroes-select').selectedOptions).map(opt => opt.value);
   const villains = Array.from(document.getElementById('villains-select').selectedOptions).map(opt => opt.value);
   const userSide = document.getElementById('user-side').value;
+  
   if (heroes.length === 0 || villains.length === 0) {
     alert('Selecciona al menos un héroe y un villano.');
     return;
   }
+  
+  // Validar configuración
+  if (!validateCharacterConfig()) {
+    return;
+  }
+  
+  const { heroConfig, villainConfig } = getCharacterConfig();
+  
   const body = {
     heroes,
     villains,
     userSide,
     firstHero: heroes[0],
-    firstVillain: villains[0]
+    firstVillain: villains[0],
+    heroConfig,
+    villainConfig
   };
+  
   const res = await fetch('/api/battle/team', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
+  
   if (res.ok) {
     alert('¡Batalla por equipos creada!');
     loadBattles();
@@ -161,19 +263,23 @@ async function showBattleDetails(battleId, container) {
   let html = '<div style="margin-top:1em;padding:1em;background:#f8fafc;border-radius:8px;">';
   html += `<strong>Turno actual:</strong> ${battle.turn || '-'}<br>`;
   if (battle.teams && battle.teams.heroes && battle.teams.villains) {
-    html += '<strong>HP Héroes:</strong><ul>';
+    html += '<strong>Héroes:</strong><ul>';
     battleHeroes.forEach(h => {
       if (h.hp > 0) {
-        html += `<li>${h.alias || h.name || h.id}: ${h.hp} HP</li>`;
+        const level = h.level || 1;
+        const defense = h.defense || 0;
+        html += `<li>${h.alias || h.name || h.id}: ${h.hp} HP | Nivel ${level} | Defensa ${defense}</li>`;
       } else {
         html += `<li style='color:#888;text-decoration:line-through;'>${h.alias || h.name || h.id}: 0 HP (derrotado)</li>`;
       }
     });
     html += '</ul>';
-    html += '<strong>HP Villanos:</strong><ul>';
+    html += '<strong>Villanos:</strong><ul>';
     battleVillains.forEach(v => {
       if (v.hp > 0) {
-        html += `<li>${v.alias || v.name || v.id}: ${v.hp} HP</li>`;
+        const level = v.level || 1;
+        const defense = v.defense || 0;
+        html += `<li>${v.alias || v.name || v.id}: ${v.hp} HP | Nivel ${level} | Defensa ${defense}</li>`;
       } else {
         html += `<li style='color:#888;text-decoration:line-through;'>${v.alias || v.name || v.id}: 0 HP (derrotado)</li>`;
       }
@@ -198,11 +304,28 @@ async function showBattleDetails(battleId, container) {
         defenderName = getAliasById(defenderId, battleHeroes);
       }
       html += `<div style='margin-bottom:0.5em;'><strong>Atacante actual:</strong> ${attackerName} <br><strong>Defensor actual:</strong> ${defenderName}</div>`;
-      html += `<form class="attack-form" data-battle-id="${battleId}" style="margin-top:1em;">
-        <input type="hidden" name="attacker" value="${attackerId}">
-        <input type="hidden" name="defender" value="${defenderId}">
-        <button type="submit">Atacar</button>
-      </form>`;
+      // Obtener información del atacante para mostrar el nivel
+      const attackerInfo = battleHeroes.concat(battleVillains).find(p => p.id == attackerId);
+      const attackerLevel = attackerInfo ? (attackerInfo.level || 1) : 1;
+      const damageMultiplier = attackerLevel;
+      
+      html += `<div style="margin-top:1em;padding:1em;background:#f0f8ff;border-radius:8px;border:1px solid #4f8cff;">
+        <h4 style="margin:0 0 0.5em 0;color:#2a5;">🎮 Controles de Ataque (Nivel ${attackerLevel})</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.5em;margin-bottom:0.5em;">
+          <button class="attack-btn" data-battle-id="${battleId}" data-attacker="${attackerId}" data-defender="${defenderId}" data-attack="basico" style="background:#ff6b6b;color:white;border:none;padding:0.5em;border-radius:4px;cursor:pointer;font-size:0.9em;">
+            <strong>👊 Básico</strong><br><small>A (${5 * damageMultiplier} daño)</small>
+          </button>
+          <button class="attack-btn" data-battle-id="${battleId}" data-attacker="${attackerId}" data-defender="${defenderId}" data-attack="especial" style="background:#4ecdc4;color:white;border:none;padding:0.5em;border-radius:4px;cursor:pointer;font-size:0.9em;">
+            <strong>⚡ Especial</strong><br><small>S (${30 * damageMultiplier} daño)</small>
+          </button>
+          <button class="attack-btn" data-battle-id="${battleId}" data-attacker="${attackerId}" data-defender="${defenderId}" data-attack="critico" style="background:#45b7d1;color:white;border:none;padding:0.5em;border-radius:4px;cursor:pointer;font-size:0.9em;">
+            <strong>💥 Crítico</strong><br><small>D (${45 * damageMultiplier} daño)</small>
+          </button>
+        </div>
+        <div style="font-size:0.8em;color:#666;text-align:center;">
+          <strong>Controles:</strong> A=Básico | S=Especial | D=Crítico | <strong>Daño multiplicado por nivel ${attackerLevel}</strong>
+        </div>
+      </div>`;
     } else {
       // Batalla finalizada
       let winnerText = '';
@@ -228,8 +351,12 @@ async function showBattleDetails(battleId, container) {
         const defenderName = getAliasById(a.defender, battleHeroes.concat(battleVillains));
         desc += `${attackerName} atacó a ${defenderName}`;
         if (a.type) desc += ` con un ataque ${a.type}`;
-        if (a.damage) desc += `. Daño: ${a.damage}`;
-        if (a.remainingHP !== undefined) desc += `. HP restante del defensor: ${a.remainingHP}`;
+        if (a.attackerLevel) desc += ` (Nivel ${a.attackerLevel})`;
+        if (a.damage) desc += `. Daño total: ${a.damage}`;
+        if (a.damageToDefense !== undefined && a.damageToDefense > 0) desc += ` (${a.damageToDefense} a defensa)`;
+        if (a.damageToHP !== undefined && a.damageToHP > 0) desc += ` (${a.damageToHP} a vida)`;
+        if (a.defenderDefense !== undefined) desc += `. Defensa restante: ${a.defenderDefense}`;
+        if (a.remainingHP !== undefined) desc += `. HP restante: ${a.remainingHP}`;
       } else {
         desc += JSON.stringify(a);
       }
@@ -495,7 +622,9 @@ function renderPersonajesTabs(heroes, villains) {
           <strong>Nombre:</strong> ${personaje.name || '-'}<br>
           <strong>Ciudad:</strong> ${personaje.city || '-'}<br>
           <strong>Equipo:</strong> ${personaje.team || '-'}<br>
-          <strong>Poder:</strong> ${personaje.power !== undefined ? personaje.power : '-'}
+          <strong>Poder:</strong> ${personaje.power !== undefined ? personaje.power : '-'}<br>
+          <strong>Nivel:</strong> ${personaje.level || 1}<br>
+          <strong>Defensa:</strong> ${personaje.defense || 0}
         </div>`;
         detailDiv.dataset.id = personaje.id;
       };
@@ -541,12 +670,204 @@ async function loadBattles() {
 document.getElementById('battle-form-individual').addEventListener('submit', createBattleIndividual);
 document.getElementById('battle-form-team').addEventListener('submit', createBattleTeam);
 
+// Función para crear formularios de configuración de personajes
+function createCharacterConfigForms() {
+  const heroesSelect = document.getElementById('heroes-select');
+  const villainsSelect = document.getElementById('villains-select');
+  const heroesConfigList = document.getElementById('heroes-config-list');
+  const villainsConfigList = document.getElementById('villains-config-list');
+  
+  if (!heroesSelect || !villainsSelect || !heroesConfigList || !villainsConfigList) return;
+  
+  // Función para crear formulario de configuración
+  function createConfigForm(characterId, characterName, type) {
+    const div = document.createElement('div');
+    div.className = 'character-input';
+    div.id = `${type}-config-${characterId}`;
+    div.style.display = 'none';
+    
+    div.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 1em; width: 100%;">
+        <div style="flex: 1; min-width: 120px;">
+          <strong>${characterName}</strong>
+        </div>
+        <div style="display: flex; gap: 0.5em; align-items: center;">
+          <label style="margin: 0; font-size: 0.9em;">Nivel:</label>
+          <select id="${type}-level-${characterId}" style="width: 60px;">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 0.5em; align-items: center;">
+          <label style="margin: 0; font-size: 0.9em;">Defensa:</label>
+          <input type="number" id="${type}-defense-${characterId}" min="0" max="50" value="25" 
+                 style="width: 70px;" placeholder="0-50" title="Defensa máxima: 50">
+        </div>
+        <div style="flex: 1;">
+          <div id="${type}-message-${characterId}" class="success-message" style="display:none; font-size: 0.8em;">
+            ✅ Válido
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Agregar validación en tiempo real para defensa
+    const defenseInput = div.querySelector(`#${type}-defense-${characterId}`);
+    const messageDiv = div.querySelector(`#${type}-message-${characterId}`);
+    
+    defenseInput.addEventListener('input', function() {
+      const value = parseInt(this.value);
+      if (value > 50) {
+        this.style.borderColor = '#dc3545';
+        messageDiv.textContent = '❌ Máximo 50';
+        messageDiv.className = 'error-message';
+        messageDiv.style.display = 'block';
+      } else if (value < 0) {
+        this.style.borderColor = '#dc3545';
+        messageDiv.textContent = '❌ Mínimo 0';
+        messageDiv.className = 'error-message';
+        messageDiv.style.display = 'block';
+      } else {
+        this.style.borderColor = '#ced4da';
+        messageDiv.textContent = '✅ Válido';
+        messageDiv.className = 'success-message';
+        messageDiv.style.display = 'block';
+      }
+    });
+    
+    // Validación inicial
+    defenseInput.dispatchEvent(new Event('input'));
+    
+    return div;
+  }
+  
+  // Crear formularios para todos los héroes
+  HEROES_CACHE.forEach(hero => {
+    const form = createConfigForm(hero.id, hero.alias || hero.name, 'hero');
+    heroesConfigList.appendChild(form);
+  });
+  
+  // Crear formularios para todos los villanos
+  VILLAINS_CACHE.forEach(villain => {
+    const form = createConfigForm(villain.id, villain.alias || villain.name, 'villain');
+    villainsConfigList.appendChild(form);
+  });
+  
+  // Eventos para mostrar/ocultar formularios según selección
+  heroesSelect.addEventListener('change', function() {
+    const selectedHeroes = Array.from(this.selectedOptions).map(opt => opt.value);
+    
+    // Ocultar todos los formularios de héroes
+    heroesConfigList.querySelectorAll('.character-input').forEach(form => {
+      form.style.display = 'none';
+    });
+    
+    // Mostrar solo los formularios de héroes seleccionados
+    selectedHeroes.forEach(heroId => {
+      const form = document.getElementById(`hero-config-${heroId}`);
+      if (form) form.style.display = 'flex';
+    });
+  });
+  
+  villainsSelect.addEventListener('change', function() {
+    const selectedVillains = Array.from(this.selectedOptions).map(opt => opt.value);
+    
+    // Ocultar todos los formularios de villanos
+    villainsConfigList.querySelectorAll('.character-input').forEach(form => {
+      form.style.display = 'none';
+    });
+    
+    // Mostrar solo los formularios de villanos seleccionados
+    selectedVillains.forEach(villainId => {
+      const form = document.getElementById(`villain-config-${villainId}`);
+      if (form) form.style.display = 'flex';
+    });
+  });
+}
+
 // Inicializar
 loadHeroesAndVillains();
 loadBattles();
 
+  // Crear formularios de configuración después de cargar los datos
+  setTimeout(createCharacterConfigForms, 1000);
+  
+
+
 // Agregar estilos para los botones de tabs
 const style = document.createElement('style');
 style.innerHTML = `.tab-btn { padding: 0.5em 1.2em; border: none; border-radius: 6px 6px 0 0; background: #e0e4ea; color: #222; font-weight: 600; cursor: pointer; margin-right: 0.5em; transition: background 0.2s; }
-.tab-btn.active { background: #4f8cff; color: #fff; }`;
-document.head.appendChild(style); 
+.tab-btn.active { background: #4f8cff; color: #fff; }
+.attack-btn:hover { transform: scale(1.05); transition: transform 0.2s; }
+.attack-btn:active { transform: scale(0.95); }`;
+document.head.appendChild(style);
+
+// Manejo de eventos para botones de ataque
+document.addEventListener('click', async function(e) {
+  if (e.target.classList.contains('attack-btn')) {
+    const battleId = e.target.dataset.battleId;
+    const attacker = e.target.dataset.attacker;
+    const defender = e.target.dataset.defender;
+    const attackType = e.target.dataset.attack;
+    
+    // Deshabilitar todos los botones durante el ataque
+    const allButtons = document.querySelectorAll('.attack-btn');
+    allButtons.forEach(btn => btn.disabled = true);
+    
+    try {
+      const response = await fetch(`/api/battle/${battleId}/attack`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ attacker, defender, attackType })
+      });
+      
+      if (response.ok) {
+        // Recargar la batalla para mostrar el resultado
+        const battle = await response.json();
+        // Encontrar y actualizar el contenedor de la batalla
+        const battleContainer = e.target.closest('.battle');
+        if (battleContainer) {
+          showBattleDetails(battleId, battleContainer);
+        }
+      } else {
+        const error = await response.json();
+        alert('Error al realizar ataque: ' + (error.error || 'Error desconocido'));
+      }
+    } catch (error) {
+      alert('Error de conexión: ' + error.message);
+    } finally {
+      // Rehabilitar botones
+      allButtons.forEach(btn => btn.disabled = false);
+    }
+  }
+});
+
+// Controles de teclado para ataques
+document.addEventListener('keydown', async function(e) {
+  // Solo activar si estamos en una batalla por equipos
+  const attackButtons = document.querySelectorAll('.attack-btn');
+  if (attackButtons.length === 0) return;
+  
+  let attackType = null;
+  switch(e.key.toLowerCase()) {
+    case 'a':
+      attackType = 'basico';
+      break;
+    case 's':
+      attackType = 'especial';
+      break;
+    case 'd':
+      attackType = 'critico';
+      break;
+    default:
+      return; // No es una tecla de ataque
+  }
+  
+  // Encontrar el botón correspondiente y simular clic
+  const targetButton = document.querySelector(`[data-attack="${attackType}"]`);
+  if (targetButton && !targetButton.disabled) {
+    e.preventDefault(); // Prevenir comportamiento por defecto
+    targetButton.click();
+  }
+}); 

@@ -91,6 +91,42 @@
       box-shadow: 0 1px 6px rgba(60,60,100,0.06);
       font-size: 0.98em;
     }
+    .character-input {
+      display: flex;
+      gap: 0.5em;
+      align-items: center;
+      margin-bottom: 0.5em;
+      padding: 0.5em;
+      background: white;
+      border-radius: 4px;
+      border: 1px solid #e9ecef;
+    }
+    .character-input label {
+      margin: 0;
+      font-size: 0.9em;
+      min-width: 80px;
+    }
+    .character-input input, .character-input select {
+      margin: 0;
+      padding: 0.3em 0.5em;
+      border: 1px solid #ced4da;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    .character-input input:focus, .character-input select:focus {
+      border-color: #4f8cff;
+      outline: none;
+    }
+    .error-message {
+      color: #dc3545;
+      font-size: 0.8em;
+      margin-top: 0.2em;
+    }
+    .success-message {
+      color: #28a745;
+      font-size: 0.8em;
+      margin-top: 0.2em;
+    }
     @media (max-width: 900px) {
       .container { flex-direction: column; gap: 1em; }
       .list, .form, .battles { min-width: unset; }
@@ -138,6 +174,26 @@
             <option value="villains">Villanos</option>
           </select>
         </label>
+        
+        <!-- Configuración de personajes -->
+        <div id="character-config" style="margin-top: 1em; padding: 1em; background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
+          <h4 style="margin: 0 0 0.5em 0; color: #495057;">⚙️ Configuración de Personajes</h4>
+          
+          <!-- Configuración de Héroes -->
+          <div id="heroes-config" style="margin-bottom: 1em;">
+            <h5 style="margin: 0 0 0.5em 0; color: #6c757d;">🦸 Héroes</h5>
+            <div id="heroes-config-list"></div>
+          </div>
+          
+          <!-- Configuración de Villanos -->
+          <div id="villains-config">
+            <h5 style="margin: 0 0 0.5em 0; color: #6c757d;">🦹 Villanos</h5>
+            <div id="villains-config-list"></div>
+          </div>
+          
+
+        </div>
+        
         <button type="submit">Crear Batalla por Equipos</button>
       </form>
     </div>

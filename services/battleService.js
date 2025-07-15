@@ -112,15 +112,65 @@ async function getBattleById(battleId) {
 }
 
 // NUEVO: Crear batalla por equipos
-async function createTeamBattle({ heroes, villains, userSide, firstHero, firstVillain }) {
+async function createTeamBattle({ heroes, villains, userSide, firstHero, firstVillain, heroConfig = {}, villainConfig = {} }) {
   const id = Date.now();
   const battle = new Battle({ id, heroes, villains, userSide, firstHero, firstVillain });
+  
+  // Cargar datos completos de héroes y villanos para obtener nivel y defensa por defecto
+  const heroesData = await getHeroes();
+  const villainsData = await getVillains();
+  
+  // Asignar nivel y defensa inicial a cada personaje (usando configuración personalizada o valores por defecto)
+  battle.teams.heroes.forEach(hero => {
+    const heroData = heroesData.find(h => h.id === hero.id);
+    const customConfig = heroConfig[hero.id];
+    
+    if (customConfig) {
+      // Usar configuración personalizada
+      hero.level = customConfig.level || 1;
+      hero.defense = customConfig.defense || 0;
+      hero.maxDefense = customConfig.defense || 0;
+    } else if (heroData) {
+      // Usar valores por defecto del archivo
+      hero.level = heroData.level || 1;
+      hero.defense = heroData.defense || 0;
+      hero.maxDefense = heroData.defense || 0;
+    } else {
+      // Valores por defecto
+      hero.level = 1;
+      hero.defense = 0;
+      hero.maxDefense = 0;
+    }
+  });
+  
+  battle.teams.villains.forEach(villain => {
+    const villainData = villainsData.find(v => v.id === villain.id);
+    const customConfig = villainConfig[villain.id];
+    
+    if (customConfig) {
+      // Usar configuración personalizada
+      villain.level = customConfig.level || 1;
+      villain.defense = customConfig.defense || 0;
+      villain.maxDefense = customConfig.defense || 0;
+    } else if (villainData) {
+      // Usar valores por defecto del archivo
+      villain.level = villainData.level || 1;
+      villain.defense = villainData.defense || 0;
+      villain.maxDefense = villainData.defense || 0;
+    } else {
+      // Valores por defecto
+      villain.level = 1;
+      villain.defense = 0;
+      villain.maxDefense = 0;
+    }
+  });
+  
   await saveBattle(battle);
   return battle;
 }
 
 // NUEVO: Realizar ataque por turnos en batalla por equipos
-async function teamAttack(battleId, attackerId, defenderId) {
+async function teamAttack(battleId, attackerId, defenderId, attackType = null) {
   const battles = await getBattles();
   const battle = battles.find(b => b.id === battleId);
   if (!battle || battle.finished) throw new Error('Batalla no encontrada o ya finalizada');
@@ -166,7 +216,7 @@ async function teamAttack(battleId, attackerId, defenderId) {
   }
 
   // Función para realizar un ataque entre los activos
-  function realizarAtaque(attackerId, defenderId) {
+  function realizarAtaque(attackerId, defenderId, attackType = null) {
     let atacante, defensor;
     if (battle.current.side === 'heroes') {
       atacante = battle.teams.heroes.find(h => h.id === attackerId);
@@ -177,24 +227,70 @@ async function teamAttack(battleId, attackerId, defenderId) {
     }
     if (!atacante || atacante.hp === 0) return false;
     if (!defensor || defensor.hp === 0) return false;
-    const golpes = [
-      { tipo: 'basico', damage: 5 },
-      { tipo: 'especial', damage: 30 },
-      { tipo: 'critico', damage: 45 },
-    ];
-    const golpe = golpes[Math.floor(Math.random() * golpes.length)];
-    defensor.hp = Math.max(0, defensor.hp - golpe.damage);
+    
+    // Definir tipos de ataques disponibles (los 3 originales)
+    const ataques = {
+      'basico': { tipo: 'Básico', damage: 5 },
+      'especial': { tipo: 'Especial', damage: 30 },
+      'critico': { tipo: 'Crítico', damage: 45 }
+    };
+    
+    let golpe;
+    if (attackType && ataques[attackType]) {
+      // Usuario eligió un ataque específico
+      golpe = ataques[attackType];
+    } else {
+      // Ataque aleatorio para la IA (solo entre los 3 originales)
+      const ataquesIA = ['basico', 'especial', 'critico'];
+      const ataqueAleatorio = ataquesIA[Math.floor(Math.random() * ataquesIA.length)];
+      golpe = ataques[ataqueAleatorio];
+    }
+    
+    // Calcular daño basado en el nivel del atacante
+    const nivelMultiplicador = atacante.level || 1;
+    const dañoBase = golpe.damage;
+    const dañoFinal = dañoBase * nivelMultiplicador;
+    
+    // Sistema de defensa: primero reducir defensa, luego vida
+    let dañoRestante = dañoFinal;
+    let defensaReducida = 0;
+    let vidaReducida = 0;
+    
+    // Si hay defensa, reducirla primero
+    if (defensor.defense > 0) {
+      defensaReducida = Math.min(defensor.defense, dañoRestante);
+      defensor.defense = Math.max(0, defensor.defense - defensaReducida);
+      dañoRestante -= defensaReducida;
+    }
+    
+    // Si queda daño después de reducir defensa, reducir vida
+    if (dañoRestante > 0) {
+      vidaReducida = dañoRestante;
+      defensor.hp = Math.max(0, defensor.hp - vidaReducida);
+    }
+    
+    // Regenerar un poco de defensa al final del turno (máximo 10% de la defensa máxima)
+    if (defensor.maxDefense) {
+      const regeneracion = Math.floor(defensor.maxDefense * 0.1);
+      defensor.defense = Math.min(defensor.maxDefense, defensor.defense + regeneracion);
+    }
+    
     battle.actions.push({
       turn: battle.turn,
       attacker: attackerId,
-      attackerTeam: battle.current.side, // usar siempre el valor actual
+      attackerTeam: battle.current.side,
       defender: defenderId,
       defenderTeam: battle.current.side === 'heroes' ? 'villains' : 'heroes',
       type: golpe.tipo,
-      damage: golpe.damage,
+      damage: dañoFinal,
+      damageToDefense: defensaReducida,
+      damageToHP: vidaReducida,
+      attackerLevel: atacante.level,
+      defenderDefense: defensor.defense,
       remainingHP: defensor.hp,
       timestamp: new Date().toISOString(),
     });
+    
     // Verificar si el defensor fue derrotado
     if (defensor.hp === 0) {
       const defenderTeam = battle.current.side === 'heroes' ? 'villains' : 'heroes';
@@ -211,7 +307,7 @@ async function teamAttack(battleId, attackerId, defenderId) {
   }
 
   // 1. Ataque del usuario (solo entre activos)
-  if (!realizarAtaque(attackerId, defenderId)) {
+  if (!realizarAtaque(attackerId, defenderId, attackType)) {
     // Actualizar los activos si alguno murió
     actualizarActivos();
     await fs.writeJson(BATTLES_PATH, battles, { spaces: 2 });

@@ -3,8 +3,8 @@ export default class Battle {
   constructor({ id, heroes, villains, userSide, firstHero, firstVillain }) {
     this.id = id;
     this.teams = {
-      heroes: heroes.map(heroId => ({ id: heroId, hp: 100 })),
-      villains: villains.map(villainId => ({ id: villainId, hp: 100 })),
+      heroes: heroes.map(heroId => ({ id: heroId, hp: 100, defense: 0 })),
+      villains: villains.map(villainId => ({ id: villainId, hp: 100, defense: 0 })),
     };
     this.userSide = userSide; // 'heroes' o 'villains'
     this.turn = 1;

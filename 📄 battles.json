@@ -6240,5 +6240,1146 @@
     "finished": true,
     "winner": "villains",
     "createdAt": "2025-07-14T19:01:04.078Z"
+  },
+  {
+    "id": 1752523462024,
+    "timestamp": "2025-07-14T20:04:22.024Z",
+    "hero": {
+      "id": 2,
+      "name": "Tony Stark",
+      "alias": "Iron Man",
+      "power": 80,
+      "finalPower": 82.94
+    },
+    "villain": {
+      "id": 1,
+      "name": "Lex Luthor",
+      "alias": "Lex Luthor",
+      "power": 80,
+      "finalPower": 89.91
+    },
+    "winner": {
+      "id": 1,
+      "name": "Lex Luthor",
+      "alias": "Lex Luthor",
+      "power": 80,
+      "finalPower": 89.91
+    },
+    "loser": {
+      "id": 2,
+      "name": "Tony Stark",
+      "alias": "Iron Man",
+      "power": 80,
+      "finalPower": 82.94
+    },
+    "message": "El ganador es: Lex Luthor (Lex Luthor)",
+    "powerDifference": "6.97",
+    "isCloseBattle": false
+  },
+  {
+    "id": 1752523475494,
+    "timestamp": "2025-07-14T20:04:35.494Z",
+    "hero": {
+      "id": 2,
+      "name": "Tony Stark",
+      "alias": "Iron Man",
+      "power": 80,
+      "finalPower": 87.09
+    },
+    "villain": {
+      "id": 1,
+      "name": "Lex Luthor",
+      "alias": "Lex Luthor",
+      "power": 80,
+      "finalPower": 88.07
+    },
+    "winner": {
+      "id": 1,
+      "name": "Lex Luthor",
+      "alias": "Lex Luthor",
+      "power": 80,
+      "finalPower": 88.07
+    },
+    "loser": {
+      "id": 2,
+      "name": "Tony Stark",
+      "alias": "Iron Man",
+      "power": 80,
+      "finalPower": 87.09
+    },
+    "message": "El ganador es: Lex Luthor (Lex Luthor)",
+    "powerDifference": "0.98",
+    "isCloseBattle": true
+  },
+  {
+    "id": 1752523794991,
+    "timestamp": "2025-07-14T20:09:54.991Z",
+    "hero": {
+      "id": 2,
+      "name": "Tony Stark",
+      "alias": "Iron Man",
+      "power": 80,
+      "finalPower": 82.32
+    },
+    "villain": {
+      "id": 1,
+      "name": "Lex Luthor",
+      "alias": "Lex Luthor",
+      "power": 80,
+      "finalPower": 80.36
+    },
+    "winner": {
+      "id": 2,
+      "name": "Tony Stark",
+      "alias": "Iron Man",
+      "power": 80,
+      "finalPower": 82.32
+    },
+    "loser": {
+      "id": 1,
+      "name": "Lex Luthor",
+      "alias": "Lex Luthor",
+      "power": 80,
+      "finalPower": 80.36
+    },
+    "message": "El ganador es: Iron Man (Tony Stark)",
+    "powerDifference": "1.96",
+    "isCloseBattle": true
+  },
+  {
+    "id": 1752523974615,
+    "timestamp": "2025-07-14T20:12:54.615Z",
+    "hero": {
+      "id": 2,
+      "name": "Tony Stark",
+      "alias": "Iron Man",
+      "power": 80,
+      "finalPower": 85.32
+    },
+    "villain": {
+      "id": 1,
+      "name": "Lex Luthor",
+      "alias": "Lex Luthor",
+      "power": 80,
+      "finalPower": 84.64
+    },
+    "winner": {
+      "id": 2,
+      "name": "Tony Stark",
+      "alias": "Iron Man",
+      "power": 80,
+      "finalPower": 85.32
+    },
+    "loser": {
+      "id": 1,
+      "name": "Lex Luthor",
+      "alias": "Lex Luthor",
+      "power": 80,
+      "finalPower": 84.64
+    },
+    "message": "El ganador es: Iron Man (Tony Stark)",
+    "powerDifference": "0.68",
+    "isCloseBattle": true
+  },
+  {
+    "id": 1752523982198,
+    "timestamp": "2025-07-14T20:13:02.198Z",
+    "hero": {
+      "id": 16,
+      "name": "Stephen Vincent Strange",
+      "alias": "Doctor Strange",
+      "power": 80,
+      "finalPower": 81.23
+    },
+    "villain": {
+      "id": 4,
+      "name": "Loki Laufeyson",
+      "alias": "Loki",
+      "power": 80,
+      "finalPower": 88.93
+    },
+    "winner": {
+      "id": 4,
+      "name": "Loki Laufeyson",
+      "alias": "Loki",
+      "power": 80,
+      "finalPower": 88.93
+    },
+    "loser": {
+      "id": 16,
+      "name": "Stephen Vincent Strange",
+      "alias": "Doctor Strange",
+      "power": 80,
+      "finalPower": 81.23
+    },
+    "message": "El ganador es: Loki (Loki Laufeyson)",
+    "powerDifference": "7.69",
+    "isCloseBattle": false
+  },
+  {
+    "id": 1752523986629,
+    "timestamp": "2025-07-14T20:13:06.629Z",
+    "hero": {
+      "id": 16,
+      "name": "Stephen Vincent Strange",
+      "alias": "Doctor Strange",
+      "power": 80,
+      "finalPower": 85.02
+    },
+    "villain": {
+      "id": 9,
+      "name": "Magneto",
+      "alias": "Magneto",
+      "power": 80,
+      "finalPower": 83.22
+    },
+    "winner": {
+      "id": 16,
+      "name": "Stephen Vincent Strange",
+      "alias": "Doctor Strange",
+      "power": 80,
+      "finalPower": 85.02
+    },
+    "loser": {
+      "id": 9,
+      "name": "Magneto",
+      "alias": "Magneto",
+      "power": 80,
+      "finalPower": 83.22
+    },
+    "message": "El ganador es: Doctor Strange (Stephen Vincent Strange)",
+    "powerDifference": "1.80",
+    "isCloseBattle": true
+  },
+  {
+    "id": 1752524003179,
+    "teams": {
+      "heroes": [
+        {
+          "id": "1",
+          "hp": 0
+        },
+        {
+          "id": "2",
+          "hp": 0
+        },
+        {
+          "id": "3",
+          "hp": 100
+        }
+      ],
+      "villains": [
+        {
+          "id": "1",
+          "hp": 0
+        },
+        {
+          "id": "2",
+          "hp": 0
+        },
+        {
+          "id": "3",
+          "hp": 0
+        }
+      ]
+    },
+    "userSide": "heroes",
+    "turn": 21,
+    "actions": [
+      {
+        "turn": 1,
+        "attacker": "1",
+        "attackerTeam": "heroes",
+        "defender": "1",
+        "defenderTeam": "villains",
+        "type": "especial",
+        "damage": 30,
+        "remainingHP": 70,
+        "timestamp": "2025-07-14T20:13:34.413Z"
+      },
+      {
+        "turn": 2,
+        "attacker": "1",
+        "attackerTeam": "villains",
+        "defender": "1",
+        "defenderTeam": "heroes",
+        "type": "critico",
+        "damage": 45,
+        "remainingHP": 55,
+        "timestamp": "2025-07-14T20:13:34.414Z"
+      },
+      {
+        "turn": 3,
+        "attacker": "1",
+        "attackerTeam": "heroes",
+        "defender": "1",
+        "defenderTeam": "villains",
+        "type": "critico",
+        "damage": 45,
+        "remainingHP": 25,
+        "timestamp": "2025-07-14T20:13:36.402Z"
+      },
+      {
+        "turn": 4,
+        "attacker": "1",
+        "attackerTeam": "villains",
+        "defender": "1",
+        "defenderTeam": "heroes",
+        "type": "especial",
+        "damage": 30,
+        "remainingHP": 25,
+        "timestamp": "2025-07-14T20:13:36.402Z"
+      },
+      {
+        "turn": 5,
+        "attacker": "1",
+        "attackerTeam": "heroes",
+        "defender": "1",
+        "defenderTeam": "villains",
+        "type": "basico",
+        "damage": 5,
+        "remainingHP": 20,
+        "timestamp": "2025-07-14T20:13:36.869Z"
+      },
+      {
+        "turn": 6,
+        "attacker": "1",
+        "attackerTeam": "villains",
+        "defender": "1",
+        "defenderTeam": "heroes",
+        "type": "especial",
+        "damage": 30,
+        "remainingHP": 0,
+        "timestamp": "2025-07-14T20:13:36.869Z"
+      },
+      {
+        "turn": 7,
+        "attacker": "2",
+        "attackerTeam": "heroes",
+        "defender": "1",
+        "defenderTeam": "villains",
+        "type": "especial",
+        "damage": 30,
+        "remainingHP": 0,
+        "timestamp": "2025-07-14T20:13:38.083Z"
+      },
+      {
+        "turn": 8,
+        "attacker": "2",
+        "attackerTeam": "heroes",
+        "defender": "2",
+        "defenderTeam": "villains",
+        "type": "critico",
+        "damage": 45,
+        "remainingHP": 55,
+        "timestamp": "2025-07-14T20:13:38.394Z"
+      },
+      {
+        "turn": 9,
+        "attacker": "2",
+        "attackerTeam": "villains",
+        "defender": "2",
+        "defenderTeam": "heroes",
+        "type": "especial",
+        "damage": 30,
+        "remainingHP": 70,
+        "timestamp": "2025-07-14T20:13:38.394Z"
+      },
+      {
+        "turn": 10,
+        "attacker": "2",
+        "attackerTeam": "heroes",
+        "defender": "2",
+        "defenderTeam": "villains",
+        "type": "especial",
+        "damage": 30,
+        "remainingHP": 25,
+        "timestamp": "2025-07-14T20:13:38.655Z"
+      },
+      {
+        "turn": 11,
+        "attacker": "2",
+        "attackerTeam": "villains",
+        "defender": "2",
+        "defenderTeam": "heroes",
+        "type": "basico",
+        "damage": 5,
+        "remainingHP": 65,
+        "timestamp": "2025-07-14T20:13:38.655Z"
+      },
+      {
+        "turn": 12,
+        "attacker": "2",
+        "attackerTeam": "heroes",
+        "defender": "2",
+        "defenderTeam": "villains",
+        "type": "basico",
+        "damage": 5,
+        "remainingHP": 20,
+        "timestamp": "2025-07-14T20:13:38.874Z"
+      },
+      {
+        "turn": 13,
+        "attacker": "2",
+        "attackerTeam": "villains",
+        "defender": "2",
+        "defenderTeam": "heroes",
+        "type": "critico",
+        "damage": 45,
+        "remainingHP": 20,
+        "timestamp": "2025-07-14T20:13:38.874Z"
+      },
+      {
+        "turn": 14,
+        "attacker": "2",
+        "attackerTeam": "heroes",
+        "defender": "2",
+        "defenderTeam": "villains",
+        "type": "critico",
+        "damage": 45,
+        "remainingHP": 0,
+        "timestamp": "2025-07-14T20:13:39.098Z"
+      },
+      {
+        "turn": 15,
+        "attacker": "2",
+        "attackerTeam": "heroes",
+        "defender": "3",
+        "defenderTeam": "villains",
+        "type": "especial",
+        "damage": 30,
+        "remainingHP": 70,
+        "timestamp": "2025-07-14T20:13:39.643Z"
+      },
+      {
+        "turn": 16,
+        "attacker": "3",
+        "attackerTeam": "villains",
+        "defender": "2",
+        "defenderTeam": "heroes",
+        "type": "basico",
+        "damage": 5,
+        "remainingHP": 15,
+        "timestamp": "2025-07-14T20:13:39.643Z"
+      },
+      {
+        "turn": 17,
+        "attacker": "2",
+        "attackerTeam": "heroes",
+        "defender": "3",
+        "defenderTeam": "villains",
+        "type": "especial",
+        "damage": 30,
+        "remainingHP": 40,
+        "timestamp": "2025-07-14T20:13:39.861Z"
+      },
+      {
+        "turn": 18,
+        "attacker": "3",
+        "attackerTeam": "villains",
+        "defender": "2",
+        "defenderTeam": "heroes",
+        "type": "basico",
+        "damage": 5,
+        "remainingHP": 10,
+        "timestamp": "2025-07-14T20:13:39.861Z"
+      },
+      {
+        "turn": 19,
+        "attacker": "2",
+        "attackerTeam": "heroes",
+        "defender": "3",
+        "defenderTeam": "villains",
+        "type": "especial",
+        "damage": 30,
+        "remainingHP": 10,
+        "timestamp": "2025-07-14T20:13:40.066Z"
+      },
+      {
+        "turn": 20,
+        "attacker": "3",
+        "attackerTeam": "villains",
+        "defender": "2",
+        "defenderTeam": "heroes",
+        "type": "especial",
+        "damage": 30,
+        "remainingHP": 0,
+        "timestamp": "2025-07-14T20:13:40.066Z"
+      },
+      {
+        "turn": 21,
+        "attacker": "3",
+        "attackerTeam": "heroes",
+        "defender": "3",
+        "defenderTeam": "villains",
+        "type": "critico",
+        "damage": 45,
+        "remainingHP": 0,
+        "timestamp": "2025-07-14T20:13:40.256Z"
+      }
+    ],
+    "current": {
+      "hero": "3",
+      "villain": null,
+      "side": "heroes"
+    },
+    "finished": true,
+    "winner": "heroes",
+    "createdAt": "2025-07-14T20:13:23.179Z"
+  },
+  {
+    "id": 1752524339000,
+    "timestamp": "2025-07-14T20:18:59.000Z",
+    "hero": {
+      "id": 2,
+      "name": "Tony Stark",
+      "alias": "Iron Man",
+      "power": 80,
+      "finalPower": 83.59
+    },
+    "villain": {
+      "id": 2,
+      "name": "Joker",
+      "alias": "Joker",
+      "power": 80,
+      "finalPower": 86.06
+    },
+    "winner": {
+      "id": 2,
+      "name": "Joker",
+      "alias": "Joker",
+      "power": 80,
+      "finalPower": 86.06
+    },
+    "loser": {
+      "id": 2,
+      "name": "Tony Stark",
+      "alias": "Iron Man",
+      "power": 80,
+      "finalPower": 83.59
+    },
+    "message": "El ganador es: Joker (Joker)",
+    "powerDifference": "2.47",
+    "isCloseBattle": true
+  },
+  {
+    "id": 1752524343243,
+    "timestamp": "2025-07-14T20:19:03.243Z",
+    "hero": {
+      "id": 3,
+      "name": "Bruce Wayne",
+      "alias": "Batman",
+      "power": 80,
+      "finalPower": 83.92
+    },
+    "villain": {
+      "id": 1,
+      "name": "Lex Luthor",
+      "alias": "Lex Luthor",
+      "power": 80,
+      "finalPower": 82.6
+    },
+    "winner": {
+      "id": 3,
+      "name": "Bruce Wayne",
+      "alias": "Batman",
+      "power": 80,
+      "finalPower": 83.92
+    },
+    "loser": {
+      "id": 1,
+      "name": "Lex Luthor",
+      "alias": "Lex Luthor",
+      "power": 80,
+      "finalPower": 82.6
+    },
+    "message": "El ganador es: Batman (Bruce Wayne)",
+    "powerDifference": "1.32",
+    "isCloseBattle": true
+  },
+  {
+    "id": 1752524347497,
+    "timestamp": "2025-07-14T20:19:07.497Z",
+    "hero": {
+      "id": 6,
+      "name": "Thor Odinson",
+      "alias": "Thor",
+      "power": 80,
+      "finalPower": 84.28
+    },
+    "villain": {
+      "id": 6,
+      "name": "Ultron",
+      "alias": "Ultron",
+      "power": 80,
+      "finalPower": 88.56
+    },
+    "winner": {
+      "id": 6,
+      "name": "Ultron",
+      "alias": "Ultron",
+      "power": 80,
+      "finalPower": 88.56
+    },
+    "loser": {
+      "id": 6,
+      "name": "Thor Odinson",
+      "alias": "Thor",
+      "power": 80,
+      "finalPower": 84.28
+    },
+    "message": "El ganador es: Ultron (Ultron)",
+    "powerDifference": "4.29",
+    "isCloseBattle": true
+  },
+  {
+    "id": 1752549406297,
+    "teams": {
+      "heroes": [
+        {
+          "id": 1,
+          "hp": 0
+        },
+        {
+          "id": 2,
+          "hp": 95
+        },
+        {
+          "id": 3,
+          "hp": 100
+        }
+      ],
+      "villains": [
+        {
+          "id": 1,
+          "hp": 0
+        },
+        {
+          "id": 2,
+          "hp": 10
+        },
+        {
+          "id": 3,
+          "hp": 100
+        }
+      ]
+    },
+    "userSide": "heroes",
+    "turn": 12,
+    "actions": [
+      {
+        "turn": 1,
+        "attacker": 1,
+        "attackerTeam": "heroes",
+        "defender": 1,
+        "defenderTeam": "villains",
+        "type": "Básico",
+        "damage": 5,
+        "remainingHP": 95,
+        "timestamp": "2025-07-15T03:17:11.423Z"
+      },
+      {
+        "turn": 2,
+        "attacker": 1,
+        "attackerTeam": "villains",
+        "defender": 1,
+        "defenderTeam": "heroes",
+        "type": "Crítico",
+        "damage": 45,
+        "remainingHP": 55,
+        "timestamp": "2025-07-15T03:17:11.423Z"
+      },
+      {
+        "turn": 3,
+        "attacker": 1,
+        "attackerTeam": "heroes",
+        "defender": 1,
+        "defenderTeam": "villains",
+        "type": "Crítico",
+        "damage": 45,
+        "remainingHP": 50,
+        "timestamp": "2025-07-15T03:18:31.123Z"
+      },
+      {
+        "turn": 4,
+        "attacker": 1,
+        "attackerTeam": "villains",
+        "defender": 1,
+        "defenderTeam": "heroes",
+        "type": "Especial",
+        "damage": 30,
+        "remainingHP": 25,
+        "timestamp": "2025-07-15T03:18:31.123Z"
+      },
+      {
+        "turn": 5,
+        "attacker": 1,
+        "attackerTeam": "heroes",
+        "defender": 1,
+        "defenderTeam": "villains",
+        "type": "Especial",
+        "damage": 30,
+        "remainingHP": 20,
+        "timestamp": "2025-07-15T03:18:47.267Z"
+      },
+      {
+        "turn": 6,
+        "attacker": 1,
+        "attackerTeam": "villains",
+        "defender": 1,
+        "defenderTeam": "heroes",
+        "type": "Básico",
+        "damage": 5,
+        "remainingHP": 20,
+        "timestamp": "2025-07-15T03:18:47.267Z"
+      },
+      {
+        "turn": 7,
+        "attacker": 1,
+        "attackerTeam": "heroes",
+        "defender": 1,
+        "defenderTeam": "villains",
+        "type": "Especial",
+        "damage": 30,
+        "remainingHP": 0,
+        "timestamp": "2025-07-15T03:19:03.539Z"
+      },
+      {
+        "turn": 8,
+        "attacker": 1,
+        "attackerTeam": "heroes",
+        "defender": 2,
+        "defenderTeam": "villains",
+        "type": "Crítico",
+        "damage": 45,
+        "remainingHP": 55,
+        "timestamp": "2025-07-15T03:19:33.450Z"
+      },
+      {
+        "turn": 9,
+        "attacker": 2,
+        "attackerTeam": "villains",
+        "defender": 1,
+        "defenderTeam": "heroes",
+        "type": "Crítico",
+        "damage": 45,
+        "remainingHP": 0,
+        "timestamp": "2025-07-15T03:19:33.450Z"
+      },
+      {
+        "turn": 10,
+        "attacker": 2,
+        "attackerTeam": "heroes",
+        "defender": 2,
+        "defenderTeam": "villains",
+        "type": "Crítico",
+        "damage": 45,
+        "remainingHP": 10,
+        "timestamp": "2025-07-15T03:19:45.887Z"
+      },
+      {
+        "turn": 11,
+        "attacker": 2,
+        "attackerTeam": "villains",
+        "defender": 2,
+        "defenderTeam": "heroes",
+        "type": "Básico",
+        "damage": 5,
+        "remainingHP": 95,
+        "timestamp": "2025-07-15T03:19:45.887Z"
+      }
+    ],
+    "current": {
+      "hero": 2,
+      "villain": 2,
+      "side": "heroes"
+    },
+    "finished": false,
+    "winner": null,
+    "createdAt": "2025-07-15T03:16:46.297Z"
+  },
+  {
+    "id": 1752553662459,
+    "teams": {
+      "heroes": [
+        {
+          "id": 1,
+          "hp": 55,
+          "defense": 4,
+          "level": 3,
+          "maxDefense": 45
+        },
+        {
+          "id": 2,
+          "hp": 100,
+          "defense": 35,
+          "level": 2,
+          "maxDefense": 35
+        },
+        {
+          "id": 3,
+          "hp": 100,
+          "defense": 40,
+          "level": 2,
+          "maxDefense": 40
+        }
+      ],
+      "villains": [
+        {
+          "id": 1,
+          "hp": 5,
+          "defense": 4,
+          "level": 2,
+          "maxDefense": 40
+        },
+        {
+          "id": 2,
+          "hp": 100,
+          "defense": 25,
+          "level": 1,
+          "maxDefense": 25
+        },
+        {
+          "id": 3,
+          "hp": 100,
+          "defense": 50,
+          "level": 3,
+          "maxDefense": 50
+        }
+      ]
+    },
+    "userSide": "heroes",
+    "turn": 3,
+    "actions": [
+      {
+        "turn": 1,
+        "attacker": 1,
+        "attackerTeam": "heroes",
+        "defender": 1,
+        "defenderTeam": "villains",
+        "type": "Crítico",
+        "damage": 135,
+        "damageToDefense": 40,
+        "damageToHP": 95,
+        "attackerLevel": 3,
+        "defenderDefense": 4,
+        "remainingHP": 5,
+        "timestamp": "2025-07-15T04:29:29.775Z"
+      },
+      {
+        "turn": 2,
+        "attacker": 1,
+        "attackerTeam": "villains",
+        "defender": 1,
+        "defenderTeam": "heroes",
+        "type": "Crítico",
+        "damage": 90,
+        "damageToDefense": 45,
+        "damageToHP": 45,
+        "attackerLevel": 2,
+        "defenderDefense": 4,
+        "remainingHP": 55,
+        "timestamp": "2025-07-15T04:29:29.775Z"
+      }
+    ],
+    "current": {
+      "hero": 1,
+      "villain": 1,
+      "side": "heroes"
+    },
+    "finished": false,
+    "winner": null,
+    "createdAt": "2025-07-15T04:27:42.459Z"
+  },
+  {
+    "id": 1752555077625,
+    "teams": {
+      "heroes": [
+        {
+          "id": 1,
+          "hp": 0,
+          "defense": 4,
+          "level": 3,
+          "maxDefense": 45
+        },
+        {
+          "id": 2,
+          "hp": 100,
+          "defense": 35,
+          "level": 2,
+          "maxDefense": 35
+        },
+        {
+          "id": 3,
+          "hp": 100,
+          "defense": 25,
+          "level": 1,
+          "maxDefense": 25
+        }
+      ],
+      "villains": [
+        {
+          "id": 1,
+          "hp": 0,
+          "defense": 4,
+          "level": 2,
+          "maxDefense": 40
+        },
+        {
+          "id": 2,
+          "hp": 0,
+          "defense": 2,
+          "level": 1,
+          "maxDefense": 25
+        },
+        {
+          "id": 3,
+          "hp": 15,
+          "defense": 5,
+          "level": 3,
+          "maxDefense": 50
+        }
+      ]
+    },
+    "userSide": "heroes",
+    "turn": 7,
+    "actions": [
+      {
+        "turn": 1,
+        "attacker": 1,
+        "attackerTeam": "heroes",
+        "defender": 1,
+        "defenderTeam": "villains",
+        "type": "Crítico",
+        "damage": 135,
+        "damageToDefense": 40,
+        "damageToHP": 95,
+        "attackerLevel": 3,
+        "defenderDefense": 4,
+        "remainingHP": 5,
+        "timestamp": "2025-07-15T04:51:52.833Z"
+      },
+      {
+        "turn": 2,
+        "attacker": 1,
+        "attackerTeam": "villains",
+        "defender": 1,
+        "defenderTeam": "heroes",
+        "type": "Especial",
+        "damage": 60,
+        "damageToDefense": 45,
+        "damageToHP": 15,
+        "attackerLevel": 2,
+        "defenderDefense": 4,
+        "remainingHP": 85,
+        "timestamp": "2025-07-15T04:51:52.833Z"
+      },
+      {
+        "turn": 3,
+        "attacker": 1,
+        "attackerTeam": "heroes",
+        "defender": 1,
+        "defenderTeam": "villains",
+        "type": "Crítico",
+        "damage": 135,
+        "damageToDefense": 4,
+        "damageToHP": 131,
+        "attackerLevel": 3,
+        "defenderDefense": 4,
+        "remainingHP": 0,
+        "timestamp": "2025-07-15T04:53:25.213Z"
+      },
+      {
+        "turn": 4,
+        "attacker": 1,
+        "attackerTeam": "heroes",
+        "defender": 2,
+        "defenderTeam": "villains",
+        "type": "Crítico",
+        "damage": 135,
+        "damageToDefense": 25,
+        "damageToHP": 110,
+        "attackerLevel": 3,
+        "defenderDefense": 2,
+        "remainingHP": 0,
+        "timestamp": "2025-07-15T04:53:43.560Z"
+      },
+      {
+        "turn": 5,
+        "attacker": 1,
+        "attackerTeam": "heroes",
+        "defender": 3,
+        "defenderTeam": "villains",
+        "type": "Crítico",
+        "damage": 135,
+        "damageToDefense": 50,
+        "damageToHP": 85,
+        "attackerLevel": 3,
+        "defenderDefense": 5,
+        "remainingHP": 15,
+        "timestamp": "2025-07-15T04:54:28.960Z"
+      },
+      {
+        "turn": 6,
+        "attacker": 3,
+        "attackerTeam": "villains",
+        "defender": 1,
+        "defenderTeam": "heroes",
+        "type": "Crítico",
+        "damage": 135,
+        "damageToDefense": 4,
+        "damageToHP": 131,
+        "attackerLevel": 3,
+        "defenderDefense": 4,
+        "remainingHP": 0,
+        "timestamp": "2025-07-15T04:54:28.960Z"
+      }
+    ],
+    "current": {
+      "hero": 2,
+      "villain": 3,
+      "side": "heroes"
+    },
+    "finished": false,
+    "winner": null,
+    "createdAt": "2025-07-15T04:51:17.625Z"
+  },
+  {
+    "id": 1752555366651,
+    "teams": {
+      "heroes": [
+        {
+          "id": "26",
+          "hp": 60,
+          "defense": 5,
+          "level": 3,
+          "maxDefense": 50
+        },
+        {
+          "id": "27",
+          "hp": 100,
+          "defense": 25,
+          "level": 1,
+          "maxDefense": 25
+        },
+        {
+          "id": "28",
+          "hp": 100,
+          "defense": 42,
+          "level": 2,
+          "maxDefense": 42
+        }
+      ],
+      "villains": [
+        {
+          "id": "1",
+          "hp": 0,
+          "defense": 2,
+          "level": 1,
+          "maxDefense": 25
+        },
+        {
+          "id": "2",
+          "hp": 0,
+          "defense": 2,
+          "level": 1,
+          "maxDefense": 25
+        },
+        {
+          "id": "3",
+          "hp": 0,
+          "defense": 2,
+          "level": 3,
+          "maxDefense": 25
+        }
+      ]
+    },
+    "userSide": "heroes",
+    "turn": 5,
+    "actions": [
+      {
+        "turn": 1,
+        "attacker": "26",
+        "attackerTeam": "heroes",
+        "defender": "1",
+        "defenderTeam": "villains",
+        "type": "Crítico",
+        "damage": 135,
+        "damageToDefense": 25,
+        "damageToHP": 110,
+        "attackerLevel": 3,
+        "defenderDefense": 2,
+        "remainingHP": 0,
+        "timestamp": "2025-07-15T04:57:58.738Z"
+      },
+      {
+        "turn": 2,
+        "attacker": "26",
+        "attackerTeam": "heroes",
+        "defender": "2",
+        "defenderTeam": "villains",
+        "type": "Crítico",
+        "damage": 135,
+        "damageToDefense": 25,
+        "damageToHP": 110,
+        "attackerLevel": 3,
+        "defenderDefense": 2,
+        "remainingHP": 0,
+        "timestamp": "2025-07-15T04:58:12.079Z"
+      },
+      {
+        "turn": 3,
+        "attacker": "26",
+        "attackerTeam": "heroes",
+        "defender": "3",
+        "defenderTeam": "villains",
+        "type": "Especial",
+        "damage": 90,
+        "damageToDefense": 25,
+        "damageToHP": 65,
+        "attackerLevel": 3,
+        "defenderDefense": 2,
+        "remainingHP": 35,
+        "timestamp": "2025-07-15T04:58:16.622Z"
+      },
+      {
+        "turn": 4,
+        "attacker": "3",
+        "attackerTeam": "villains",
+        "defender": "26",
+        "defenderTeam": "heroes",
+        "type": "Especial",
+        "damage": 90,
+        "damageToDefense": 50,
+        "damageToHP": 40,
+        "attackerLevel": 3,
+        "defenderDefense": 5,
+        "remainingHP": 60,
+        "timestamp": "2025-07-15T04:58:16.623Z"
+      },
+      {
+        "turn": 5,
+        "attacker": "26",
+        "attackerTeam": "heroes",
+        "defender": "3",
+        "defenderTeam": "villains",
+        "type": "Especial",
+        "damage": 90,
+        "damageToDefense": 2,
+        "damageToHP": 88,
+        "attackerLevel": 3,
+        "defenderDefense": 2,
+        "remainingHP": 0,
+        "timestamp": "2025-07-15T04:58:24.573Z"
+      }
+    ],
+    "current": {
+      "hero": "26",
+      "villain": null,
+      "side": "heroes"
+    },
+    "finished": true,
+    "winner": "heroes",
+    "createdAt": "2025-07-15T04:56:06.651Z"
   }
 ]

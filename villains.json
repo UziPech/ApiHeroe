@@ -1,12 +1,12 @@
 [
-{"id":1,"name":"Lex Luthor","alias":"Lex Luthor","city":"Metrópolis","team":"Ninguno","power":80},
-{"id":2,"name":"Joker","alias":"Joker","city":"Gotham City","team":"Ninguno","power":80},
-{"id":3,"name":"Thanos","alias":"Thanos","city":"Titán","team":"Orden Negra","power":80},
-{"id":4,"name":"Loki Laufeyson","alias":"Loki","city":"Asgard","team":"Ninguno","power":80},
-{"id":5,"name":"Cheetah","alias":"Cheetah","city":"Themyscira","team":"Ninguno","power":80},
-{"id":6,"name":"Ultron","alias":"Ultron","city":"Nueva York","team":"Ninguno","power":80},
-{"id":7,"name":"Darkseid","alias":"Darkseid","city":"Apokolips","team":"Ninguno","power":80},
-{"id":8,"name":"Enigma","alias":"Riddler","city":"Gotham City","team":"Ninguno","power":80},
-{"id":9,"name":"Magneto","alias":"Magneto","city":"Salem Center","team":"Hermandad de Mutantes","power":80},
-{"id":10,"name":"Harley Quinn","alias":"Harley Quinn","city":"Gotham City","team":"Escuadrón Suicida","power":80}
+{"id":1,"name":"Lex Luthor","alias":"Lex Luthor","city":"Metrópolis","team":"Ninguno","power":80,"level":2,"defense":40},
+{"id":2,"name":"Joker","alias":"Joker","city":"Gotham City","team":"Ninguno","power":80,"level":1,"defense":25},
+{"id":3,"name":"Thanos","alias":"Thanos","city":"Titán","team":"Orden Negra","power":80,"level":3,"defense":50},
+{"id":4,"name":"Loki Laufeyson","alias":"Loki","city":"Asgard","team":"Ninguno","power":80,"level":2,"defense":35},
+{"id":5,"name":"Cheetah","alias":"Cheetah","city":"Themyscira","team":"Ninguno","power":80,"level":2,"defense":30},
+{"id":6,"name":"Ultron","alias":"Ultron","city":"Nueva York","team":"Ninguno","power":80,"level":3,"defense":45},
+{"id":7,"name":"Darkseid","alias":"Darkseid","city":"Apokolips","team":"Ninguno","power":80,"level":3,"defense":48},
+{"id":8,"name":"Enigma","alias":"Riddler","city":"Gotham City","team":"Ninguno","power":80,"level":1,"defense":28},
+{"id":9,"name":"Magneto","alias":"Magneto","city":"Salem Center","team":"Hermandad de Mutantes","power":80,"level":3,"defense":42},
+{"id":10,"name":"Harley Quinn","alias":"Harley Quinn","city":"Gotham City","team":"Escuadrón Suicida","power":80,"level":1,"defense":26}
 ]
