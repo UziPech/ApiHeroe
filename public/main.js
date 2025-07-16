@@ -55,6 +55,13 @@ async function loadHeroesAndVillains() {
     }
   });
 
+  // Al cargar héroes y villanos, también poblar los selectores de primer atacante/defensor para equipos
+  const firstAttackerTeam = document.getElementById('first-attacker-team');
+  const firstDefenderTeam = document.getElementById('first-defender-team');
+  if (firstAttackerTeam) firstAttackerTeam.innerHTML = '';
+  if (firstDefenderTeam) firstDefenderTeam.innerHTML = '';
+  // Se llenarán dinámicamente al seleccionar héroes/villanos
+
   // Renderizar tabs de personajes
   renderPersonajesTabs(heroes, villains);
 }
@@ -67,19 +74,63 @@ battleType.addEventListener('change', function() {
   document.getElementById('battle-form-team').style.display = (type === 'equipo') ? 'block' : 'none';
 });
 
-// Crear batalla individual
+// Al seleccionar héroes/villanos en batalla por equipos, poblar selectores de primer atacante/defensor
+function updateFirstAttackerDefenderOptions() {
+  const userSide = document.getElementById('user-side').value;
+  const heroes = Array.from(document.getElementById('heroes-select').selectedOptions).map(opt => opt.value);
+  const villains = Array.from(document.getElementById('villains-select').selectedOptions).map(opt => opt.value);
+  const firstAttackerTeam = document.getElementById('first-attacker-team');
+  const firstDefenderTeam = document.getElementById('first-defender-team');
+  if (firstAttackerTeam) {
+    firstAttackerTeam.innerHTML = '';
+    let attackerList = userSide === 'heroes' ? heroes : villains;
+    attackerList.forEach(id => {
+      const name = (HEROES_CACHE.find(h => h.id == id) || VILLAINS_CACHE.find(v => v.id == id) || {}).alias || id;
+      const option = document.createElement('option');
+      option.value = id;
+      option.textContent = name;
+      firstAttackerTeam.appendChild(option);
+    });
+  }
+  if (firstDefenderTeam) {
+    firstDefenderTeam.innerHTML = '';
+    let defenderList = userSide === 'heroes' ? villains : heroes;
+    defenderList.forEach(id => {
+      const name = (HEROES_CACHE.find(h => h.id == id) || VILLAINS_CACHE.find(v => v.id == id) || {}).alias || id;
+      const option = document.createElement('option');
+      option.value = id;
+      option.textContent = name;
+      firstDefenderTeam.appendChild(option);
+    });
+  }
+}
+document.getElementById('heroes-select').addEventListener('change', updateFirstAttackerDefenderOptions);
+document.getElementById('villains-select').addEventListener('change', updateFirstAttackerDefenderOptions);
+document.getElementById('user-side').addEventListener('change', updateFirstAttackerDefenderOptions);
+
+// Al crear batalla individual, enviar quién ataca primero
 async function createBattleIndividual(e) {
   e.preventDefault();
   const heroId = document.getElementById('hero-select-individual').value;
   const villainId = document.getElementById('villain-select-individual').value;
+  const firstAttacker = document.getElementById('first-attacker-individual').value;
   const resultDiv = document.getElementById('duel-result');
   if (resultDiv) resultDiv.innerHTML = '';
   if (!heroId || !villainId) {
     alert('Selecciona un héroe y un villano.');
     return;
   }
+  // Determinar quién ataca primero
+  let body = {};
+  if (firstAttacker === 'hero') {
+    body = { firstHero: heroId, firstVillain: villainId };
+  } else {
+    body = { firstHero: villainId, firstVillain: heroId };
+  }
   const res = await fetch(`/api/battle/duel/${heroId}/${villainId}`, {
-    method: 'POST'
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
   });
   if (res.ok) {
     const data = await res.json();
@@ -121,8 +172,8 @@ function validateCharacterConfig() {
         return false;
       }
       
-      if (defense < 0 || defense > 50) {
-        alert(`Defensa del héroe debe estar entre 0 y 50`);
+      if (defense < 0 || defense > 70) {
+        alert(`defensa excededida`);
         return false;
       }
     }
@@ -142,8 +193,8 @@ function validateCharacterConfig() {
         return false;
       }
       
-      if (defense < 0 || defense > 50) {
-        alert(`Defensa del villano debe estar entre 0 y 50`);
+      if (defense < 0 || defense > 70) {
+        alert(`defensa excededida`);
         return false;
       }
     }
@@ -191,41 +242,48 @@ function getCharacterConfig() {
   return { heroConfig, villainConfig };
 }
 
-// Crear batalla por equipos
+// Al crear batalla por equipos, enviar primer atacante y defensor correctamente según el bando
 async function createBattleTeam(e) {
   e.preventDefault();
   const heroes = Array.from(document.getElementById('heroes-select').selectedOptions).map(opt => opt.value);
   const villains = Array.from(document.getElementById('villains-select').selectedOptions).map(opt => opt.value);
   const userSide = document.getElementById('user-side').value;
-  
+  const firstAttacker = document.getElementById('first-attacker-team').value;
+  const firstDefender = document.getElementById('first-defender-team').value;
+
   if (heroes.length === 0 || villains.length === 0) {
     alert('Selecciona al menos un héroe y un villano.');
     return;
   }
-  
-  // Validar configuración
   if (!validateCharacterConfig()) {
     return;
   }
-  
   const { heroConfig, villainConfig } = getCharacterConfig();
-  
+
+  // Asignar correctamente los IDs según el bando
+  let firstHero, firstVillain;
+  if (userSide === 'heroes') {
+    firstHero = firstAttacker; // héroe
+    firstVillain = firstDefender; // villano
+  } else {
+    firstHero = firstDefender; // héroe
+    firstVillain = firstAttacker; // villano
+  }
+
   const body = {
     heroes,
     villains,
     userSide,
-    firstHero: heroes[0],
-    firstVillain: villains[0],
+    firstHero,
+    firstVillain,
     heroConfig,
     villainConfig
   };
-  
   const res = await fetch('/api/battle/team', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
-  
   if (res.ok) {
     alert('¡Batalla por equipos creada!');
     loadBattles();
@@ -312,13 +370,13 @@ async function showBattleDetails(battleId, container) {
       html += `<div style="margin-top:1em;padding:1em;background:#f0f8ff;border-radius:8px;border:1px solid #4f8cff;">
         <h4 style="margin:0 0 0.5em 0;color:#2a5;">🎮 Controles de Ataque (Nivel ${attackerLevel})</h4>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.5em;margin-bottom:0.5em;">
-          <button class="attack-btn" data-battle-id="${battleId}" data-attacker="${attackerId}" data-defender="${defenderId}" data-attack="basico" style="background:#ff6b6b;color:white;border:none;padding:0.5em;border-radius:4px;cursor:pointer;font-size:0.9em;">
+          <button class="attack-btn" data-battle-id="${battleId}" data-attacker="${attackerId}" data-defender="${defenderId}" data-attack="basico" style="background:#1976d2;color:white;border:none;padding:0.5em;border-radius:4px;cursor:pointer;font-size:0.9em;">
             <strong>👊 Básico</strong><br><small>A (${5 * damageMultiplier} daño)</small>
           </button>
-          <button class="attack-btn" data-battle-id="${battleId}" data-attacker="${attackerId}" data-defender="${defenderId}" data-attack="especial" style="background:#4ecdc4;color:white;border:none;padding:0.5em;border-radius:4px;cursor:pointer;font-size:0.9em;">
+          <button class="attack-btn" data-battle-id="${battleId}" data-attacker="${attackerId}" data-defender="${defenderId}" data-attack="especial" style="background:#ff9800;color:white;border:none;padding:0.5em;border-radius:4px;cursor:pointer;font-size:0.9em;">
             <strong>⚡ Especial</strong><br><small>S (${30 * damageMultiplier} daño)</small>
           </button>
-          <button class="attack-btn" data-battle-id="${battleId}" data-attacker="${attackerId}" data-defender="${defenderId}" data-attack="critico" style="background:#45b7d1;color:white;border:none;padding:0.5em;border-radius:4px;cursor:pointer;font-size:0.9em;">
+          <button class="attack-btn" data-battle-id="${battleId}" data-attacker="${attackerId}" data-defender="${defenderId}" data-attack="critico" style="background:#e53935;color:white;border:none;padding:0.5em;border-radius:4px;cursor:pointer;font-size:0.9em;">
             <strong>💥 Crítico</strong><br><small>D (${45 * damageMultiplier} daño)</small>
           </button>
         </div>
@@ -578,18 +636,88 @@ function renderEnCursoTabs(ongoingIndividual, ongoingTeam) {
   // No mostrar ninguna lista por defecto
 }
 
+// --- Lógica para crear héroes y villanos desde el frontend ---
+
+// Función para agregar un héroe
+async function crearHeroe(e) {
+  e.preventDefault();
+  // Obtener valores del formulario
+  const name = document.getElementById('heroe-nombre').value.trim();
+  const alias = document.getElementById('heroe-alias').value.trim();
+  const city = document.getElementById('heroe-ciudad').value.trim();
+  // Validar campos
+  if (!name || !alias || !city) {
+    alert('Completa todos los campos para crear un héroe.');
+    return;
+  }
+  // Crear objeto para el backend
+  const nuevoHeroe = { name, alias, city };
+  // Hacer POST al backend
+  const res = await fetch('/api/heroes', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(nuevoHeroe)
+  });
+  if (res.ok) {
+    // Limpiar formulario
+    document.getElementById('form-crear-heroe').reset();
+    // Recargar lista de héroes y villanos
+    await loadHeroesAndVillains();
+    alert('¡Héroe creado exitosamente!');
+  } else {
+    const error = await res.json().catch(() => ({}));
+    alert('Error al crear héroe: ' + (error.error || res.statusText));
+  }
+}
+
+// Función para agregar un villano
+async function crearVillano(e) {
+  e.preventDefault();
+  // Obtener valores del formulario
+  const name = document.getElementById('villano-nombre').value.trim();
+  const alias = document.getElementById('villano-alias').value.trim();
+  const city = document.getElementById('villano-ciudad').value.trim();
+  // Validar campos
+  if (!name || !alias || !city) {
+    alert('Completa todos los campos para crear un villano.');
+    return;
+  }
+  // Crear objeto para el backend
+  const nuevoVillano = { name, alias, city };
+  // Hacer POST al backend
+  const res = await fetch('/api/villains', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(nuevoVillano)
+  });
+  if (res.ok) {
+    // Limpiar formulario
+    document.getElementById('form-crear-villano').reset();
+    // Recargar lista de héroes y villanos
+    await loadHeroesAndVillains();
+    alert('¡Villano creado exitosamente!');
+  } else {
+    const error = await res.json().catch(() => ({}));
+    alert('Error al crear villano: ' + (error.error || res.statusText));
+  }
+}
+
+// Asignar listeners a los formularios
+const formHeroe = document.getElementById('form-crear-heroe');
+if (formHeroe) formHeroe.addEventListener('submit', crearHeroe);
+const formVillano = document.getElementById('form-crear-villano');
+if (formVillano) formVillano.addEventListener('submit', crearVillano);
+
+// --- Modificar renderizado de personajes para mostrar solo el nombre ---
 function renderPersonajesTabs(heroes, villains) {
   const tabsDiv = document.getElementById('personajes-tabs');
   const listDiv = document.getElementById('personajes-list');
-  const detailDiv = document.getElementById('personaje-detail');
-  if (!tabsDiv || !listDiv || !detailDiv) return;
+  if (!tabsDiv || !listDiv) return;
   tabsDiv.innerHTML = '';
   listDiv.innerHTML = '';
-  detailDiv.innerHTML = '';
-  // Crear botones
+  // Crear tabs
   const btnHeroes = document.createElement('button');
   btnHeroes.textContent = `Héroes (${heroes.length})`;
-  btnHeroes.style.marginRight = '1em';
   btnHeroes.className = 'tab-btn active';
   const btnVillains = document.createElement('button');
   btnVillains.textContent = `Villanos (${villains.length})`;
@@ -599,40 +727,14 @@ function renderPersonajesTabs(heroes, villains) {
   // Renderizar lista
   function renderList(type) {
     listDiv.innerHTML = '';
-    detailDiv.innerHTML = '';
-    let list = type === 'heroes' ? heroes : villains;
-    if (list.length === 0) {
-      listDiv.innerHTML = '<div style="color:#888;">No hay personajes de este tipo.</div>';
-      return;
-    }
-    const ul = document.createElement('ul');
-    list.forEach(personaje => {
-      const li = document.createElement('li');
-      li.textContent = personaje.alias || personaje.name;
-      li.style.cursor = 'pointer';
-      li.onclick = () => {
-        // Mostrar/ocultar detalles
-        if (detailDiv.innerHTML && detailDiv.dataset.id == personaje.id) {
-          detailDiv.innerHTML = '';
-          detailDiv.dataset.id = '';
-          return;
-        }
-        detailDiv.innerHTML = `<div style='background:#f8fafc;padding:1em;border-radius:8px;margin-top:0.5em;box-shadow:0 1px 6px rgba(60,60,100,0.06);'>
-          <strong>Alias:</strong> ${personaje.alias || '-'}<br>
-          <strong>Nombre:</strong> ${personaje.name || '-'}<br>
-          <strong>Ciudad:</strong> ${personaje.city || '-'}<br>
-          <strong>Equipo:</strong> ${personaje.team || '-'}<br>
-          <strong>Poder:</strong> ${personaje.power !== undefined ? personaje.power : '-'}<br>
-          <strong>Nivel:</strong> ${personaje.level || 1}<br>
-          <strong>Defensa:</strong> ${personaje.defense || 0}
-        </div>`;
-        detailDiv.dataset.id = personaje.id;
-      };
-      ul.appendChild(li);
+    const list = type === 'heroes' ? heroes : villains;
+    list.forEach(p => {
+      const li = document.createElement('div');
+      li.textContent = p.nombre || p.name || p.alias || p.id;
+      listDiv.appendChild(li);
     });
-    listDiv.appendChild(ul);
   }
-  // Eventos
+  // Eventos de tabs
   btnHeroes.onclick = () => {
     btnHeroes.className = 'tab-btn active';
     btnVillains.className = 'tab-btn';
@@ -701,8 +803,8 @@ function createCharacterConfigForms() {
         </div>
         <div style="display: flex; gap: 0.5em; align-items: center;">
           <label style="margin: 0; font-size: 0.9em;">Defensa:</label>
-          <input type="number" id="${type}-defense-${characterId}" min="0" max="50" value="25" 
-                 style="width: 70px;" placeholder="0-50" title="Defensa máxima: 50">
+          <input type="number" id="${type}-defense-${characterId}" min="0" max="70" value="25" 
+                 style="width: 70px;" placeholder="0-70" title="Defensa máxima: 70">
         </div>
         <div style="flex: 1;">
           <div id="${type}-message-${characterId}" class="success-message" style="display:none; font-size: 0.8em;">
@@ -718,9 +820,9 @@ function createCharacterConfigForms() {
     
     defenseInput.addEventListener('input', function() {
       const value = parseInt(this.value);
-      if (value > 50) {
+      if (value > 70) {
         this.style.borderColor = '#dc3545';
-        messageDiv.textContent = '❌ Máximo 50';
+        messageDiv.textContent = '❌ defensa excededida';
         messageDiv.className = 'error-message';
         messageDiv.style.display = 'block';
       } else if (value < 0) {
@@ -804,6 +906,9 @@ style.innerHTML = `.tab-btn { padding: 0.5em 1.2em; border: none; border-radius:
 document.head.appendChild(style);
 
 // Manejo de eventos para botones de ataque
+// Este evento escucha los clics en los botones de ataque y realiza la petición a la API
+// con los parámetros correctos, deshabilitando los botones mientras se procesa
+// y actualizando la interfaz con el resultado
 document.addEventListener('click', async function(e) {
   if (e.target.classList.contains('attack-btn')) {
     const battleId = e.target.dataset.battleId;

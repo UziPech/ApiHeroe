@@ -171,13 +171,21 @@ async function createTeamBattle({ heroes, villains, userSide, firstHero, firstVi
 
 // NUEVO: Realizar ataque por turnos en batalla por equipos
 async function teamAttack(battleId, attackerId, defenderId, attackType = null) {
+  // Cargar todas las batallas
   const battles = await getBattles();
+  // Buscar la batalla correspondiente
   const battle = battles.find(b => b.id === battleId);
+  // Si la batalla no existe o ya terminó, lanzar error
   if (!battle || battle.finished) throw new Error('Batalla no encontrada o ya finalizada');
 
-  // Determinar IDs activos
+  // Cargar datos de héroes y villanos para obtener nombres y detalles
+  const heroesData = await getHeroes();
+  const villainsData = await getVillains();
+
+  // Determinar los IDs activos de héroe y villano
   const activeHero = battle.current.hero;
   const activeVillain = battle.current.villain;
+  // Determinar de qué equipo es el usuario
   const userTeam = battle.userSide;
 
   // Validar que el usuario solo pueda atacar con su personaje activo y al rival activo
@@ -193,94 +201,99 @@ async function teamAttack(battleId, attackerId, defenderId, attackType = null) {
     throw new Error('No es el turno de tu equipo');
   }
 
-  // Función para actualizar los personajes activos
+  // Función para actualizar los personajes activos de cada equipo
   function actualizarActivos() {
+    // Buscar el siguiente héroe vivo
     battle.current.hero = siguienteVivo('heroes', battle.current.hero);
+    // Buscar el siguiente villano vivo
     battle.current.villain = siguienteVivo('villains', battle.current.villain);
+    // Eliminar campo mal escrito si existe
     if (battle.current.heroe !== undefined) delete battle.current.heroe;
   }
 
-  // Función para cambiar al siguiente personaje vivo de un equipo
+  // Función para encontrar el siguiente personaje vivo de un equipo
   function siguienteVivo(equipo, actualId) {
+    // Filtrar personajes vivos
     const vivos = battle.teams[equipo].filter(p => p.hp > 0);
     if (vivos.length === 0) return null;
-    
-    // Si el personaje actual está muerto, cambiar al primer vivo
+    // Si el personaje actual está muerto, devolver el primer vivo
     const actual = battle.teams[equipo].find(p => p.id === actualId);
     if (!actual || actual.hp === 0) {
       return vivos[0].id;
     }
-    
     // Si el personaje actual está vivo, mantenerlo
     return actualId;
   }
 
-  // Función para realizar un ataque entre los activos
-  function realizarAtaque(attackerId, defenderId, attackType = null) {
+  // Array para registrar el resultado de ambos ataques (usuario y enemigo)
+  const turnResults = [];
+  let defeatedInfo = [];
+  let winnerInfo = null;
+
+  // Función para realizar un ataque y registrar la acción
+  function realizarAtaque(attackerId, defenderId, attackType = null, side) {
     let atacante, defensor;
-    if (battle.current.side === 'heroes') {
+    let defenderTeamName;
+    // Determinar quién ataca y quién defiende según el lado
+    if (side === 'heroes') {
       atacante = battle.teams.heroes.find(h => h.id === attackerId);
       defensor = battle.teams.villains.find(v => v.id === defenderId);
+      defenderTeamName = 'villains';
     } else {
       atacante = battle.teams.villains.find(v => v.id === attackerId);
       defensor = battle.teams.heroes.find(h => h.id === defenderId);
+      defenderTeamName = 'heroes';
     }
+    // Si el atacante o defensor está muerto, no hacer nada
     if (!atacante || atacante.hp === 0) return false;
     if (!defensor || defensor.hp === 0) return false;
-    
-    // Definir tipos de ataques disponibles (los 3 originales)
+    // Definir tipos de ataques disponibles
     const ataques = {
       'basico': { tipo: 'Básico', damage: 5 },
       'especial': { tipo: 'Especial', damage: 30 },
       'critico': { tipo: 'Crítico', damage: 45 }
     };
-    
     let golpe;
     if (attackType && ataques[attackType]) {
-      // Usuario eligió un ataque específico
+      // Si el usuario eligió un ataque específico
       golpe = ataques[attackType];
     } else {
-      // Ataque aleatorio para la IA (solo entre los 3 originales)
+      // Si es la IA, elegir ataque aleatorio
       const ataquesIA = ['basico', 'especial', 'critico'];
       const ataqueAleatorio = ataquesIA[Math.floor(Math.random() * ataquesIA.length)];
       golpe = ataques[ataqueAleatorio];
     }
-    
-    // Calcular daño basado en el nivel del atacante
+    // Calcular daño según el nivel del atacante
     const nivelMultiplicador = atacante.level || 1;
     const dañoBase = golpe.damage;
     const dañoFinal = dañoBase * nivelMultiplicador;
-    
     // Sistema de defensa: primero reducir defensa, luego vida
     let dañoRestante = dañoFinal;
     let defensaReducida = 0;
     let vidaReducida = 0;
-    
-    // Si hay defensa, reducirla primero
+    // Reducir defensa primero
     if (defensor.defense > 0) {
       defensaReducida = Math.min(defensor.defense, dañoRestante);
       defensor.defense = Math.max(0, defensor.defense - defensaReducida);
       dañoRestante -= defensaReducida;
     }
-    
-    // Si queda daño después de reducir defensa, reducir vida
+    // Si queda daño, reducir vida
     if (dañoRestante > 0) {
       vidaReducida = dañoRestante;
       defensor.hp = Math.max(0, defensor.hp - vidaReducida);
     }
-    
-    // Regenerar un poco de defensa al final del turno (máximo 10% de la defensa máxima)
+    // Regenerar defensa al final del turno (si aplica)
     if (defensor.maxDefense) {
       const regeneracion = Math.floor(defensor.maxDefense * 0.1);
       defensor.defense = Math.min(defensor.maxDefense, defensor.defense + regeneracion);
     }
-    
-    battle.actions.push({
+    // Registrar la acción en el historial
+    const action = {
       turn: battle.turn,
-      attacker: attackerId,
-      attackerTeam: battle.current.side,
-      defender: defenderId,
-      defenderTeam: battle.current.side === 'heroes' ? 'villains' : 'heroes',
+      attacker: atacante.id,
+      attackerTeam: side,
+      defender: defensor.id,
+      defenderTeam: defenderTeamName,
       type: golpe.tipo,
       damage: dañoFinal,
       damageToDefense: defensaReducida,
@@ -289,17 +302,35 @@ async function teamAttack(battleId, attackerId, defenderId, attackType = null) {
       defenderDefense: defensor.defense,
       remainingHP: defensor.hp,
       timestamp: new Date().toISOString(),
-    });
-    
+    };
+    battle.actions.push(action);
+    turnResults.push(action);
     // Verificar si el defensor fue derrotado
     if (defensor.hp === 0) {
-      const defenderTeam = battle.current.side === 'heroes' ? 'villains' : 'heroes';
+      // Guardar info del derrotado
+      let defeatedData = null;
+      if (defenderTeamName === 'heroes') {
+        defeatedData = heroesData.find(h => h.id === defensor.id);
+      } else {
+        defeatedData = villainsData.find(v => v.id === defensor.id);
+      }
+      defeatedInfo.push({
+        id: defensor.id,
+        team: defenderTeamName,
+        name: defeatedData ? defeatedData.name : undefined,
+        alias: defeatedData ? defeatedData.alias : undefined
+      });
+      const defenderTeam = defenderTeamName;
+      // Buscar si hay otro personaje vivo en el equipo defensor
       const next = battle.teams[defenderTeam].find(p => p.hp > 0);
       if (!next) {
+        // Si no hay más personajes vivos, la batalla termina
         battle.finished = true;
         battle.winner = defenderTeam === 'heroes' ? 'villains' : 'heroes';
+        winnerInfo = battle.winner;
         return false; // Termina la batalla
       } else {
+        // Si hay otro personaje, actualizar el activo
         battle.current[defenderTeam.slice(0, -1)] = next.id;
       }
     }
@@ -307,84 +338,146 @@ async function teamAttack(battleId, attackerId, defenderId, attackType = null) {
   }
 
   // 1. Ataque del usuario (solo entre activos)
-  if (!realizarAtaque(attackerId, defenderId, attackType)) {
-    // Actualizar los activos si alguno murió
+  if (!realizarAtaque(attackerId, defenderId, attackType, battle.current.side)) {
+    // Si el defensor murió, actualizar activos y guardar
     actualizarActivos();
     await fs.writeJson(BATTLES_PATH, battles, { spaces: 2 });
-    return battle;
+    return {
+      battle,
+      turnResults,
+      defeated: defeatedInfo,
+      winner: winnerInfo,
+      nextTurn: {
+        side: battle.current.side,
+        hero: battle.current.hero,
+        villain: battle.current.villain
+      }
+    };
   }
+  // Incrementar el turno
   battle.turn++;
-
-  // Actualizar activos después del ataque del usuario
+  // Actualizar activos después del ataque
   actualizarActivos();
 
-  // Verificar si el defensor murió después del ataque del usuario
-  const defenderTeam = battle.current.side === 'heroes' ? 'villains' : 'heroes';
-  const defensor = battle.teams[defenderTeam].find(p => p.id === defenderId);
-  
-  // Si el defensor murió, terminar el turno sin ataque automático
-  if (defensor && defensor.hp === 0) {
-    // Verificar si el equipo del defensor tiene más personajes vivos
-    const nextDefender = battle.teams[defenderTeam].find(p => p.hp > 0);
-    if (!nextDefender) {
-      // No hay más personajes vivos en el equipo del defensor
-      battle.finished = true;
-      battle.winner = battle.current.side;
-      await fs.writeJson(BATTLES_PATH, battles, { spaces: 2 });
-      return battle;
-    } else {
-      // Cambiar al siguiente personaje vivo del equipo del defensor
-      battle.current[defenderTeam.slice(0, -1)] = nextDefender.id;
-      // Alternar turno al equipo del usuario
-      battle.current.side = userTeam;
-      actualizarActivos();
-      await fs.writeJson(BATTLES_PATH, battles, { spaces: 2 });
-      return battle;
-    }
-  }
-
-  // Alternar turno solo si el equipo contrario tiene personajes vivos
-  const nextSide = battle.current.side === 'heroes' ? 'villains' : 'heroes';
-  const nextActive = battle.teams[nextSide].find(p => p.hp > 0);
-  if (nextActive) {
-    battle.current.side = nextSide;
-    // Actualizar los activos si alguno murió
-    actualizarActivos();
-  } else {
-    // Si no hay personajes vivos en el equipo contrario, termina la batalla
-    battle.finished = true;
-    battle.winner = battle.current.side;
+  // Si la batalla terminó tras el ataque del usuario
+  if (battle.finished) {
     await fs.writeJson(BATTLES_PATH, battles, { spaces: 2 });
-    return battle;
+    return {
+      battle,
+      turnResults,
+      defeated: defeatedInfo,
+      winner: winnerInfo,
+      nextTurn: null
+    };
   }
 
-  // 2. Ataques automáticos del bando contrario (solo entre activos) hasta que vuelva el turno del usuario o termine la batalla
-  while (!battle.finished && battle.current.side !== userTeam) {
-    const autoAttacker = battle.current.side === 'heroes' ? battle.current.hero : battle.current.villain;
-    const autoDefender = battle.current.side === 'heroes' ? battle.current.villain : battle.current.hero;
-    if (!realizarAtaque(autoAttacker, autoDefender)) break;
+  // Cambiar el turno al equipo contrario
+  battle.current.side = (userTeam === 'heroes') ? 'villains' : 'heroes';
+  actualizarActivos();
+
+  // 2. Ataque automático del enemigo (IA) si sigue vivo
+  const enemySide = battle.current.side;
+  const autoAttacker = enemySide === 'heroes' ? battle.current.hero : battle.current.villain;
+  const autoDefender = enemySide === 'heroes' ? battle.current.villain : battle.current.hero;
+  // Solo atacar si ambos están vivos y la batalla no ha terminado
+  if (autoAttacker && autoDefender && !battle.finished) {
+    realizarAtaque(autoAttacker, autoDefender, null, enemySide);
     battle.turn++;
-    // Alternar turno solo si el equipo contrario tiene personajes vivos
-    const nextAutoSide = battle.current.side === 'heroes' ? 'villains' : 'heroes';
-    const nextAutoActive = battle.teams[nextAutoSide].find(p => p.hp > 0);
-    if (nextAutoActive) {
-      battle.current.side = nextAutoSide;
-      actualizarActivos();
-    } else {
-      battle.finished = true;
-      battle.winner = battle.current.side;
-      break;
-    }
+    actualizarActivos();
   }
 
+  // Si la batalla terminó tras el ataque automático
+  if (battle.finished) {
+    await fs.writeJson(BATTLES_PATH, battles, { spaces: 2 });
+    return {
+      battle,
+      turnResults,
+      defeated: defeatedInfo,
+      winner: winnerInfo,
+      nextTurn: null
+    };
+  }
+
+  // Cambiar el turno de vuelta al usuario
+  battle.current.side = userTeam;
+  actualizarActivos();
+
+  // Guardar el estado actualizado de la batalla
   await fs.writeJson(BATTLES_PATH, battles, { spaces: 2 });
-  return battle;
+  // Retornar el estado de la batalla, el resultado de ambos ataques, derrotados y el siguiente turno
+  return {
+    battle,
+    turnResults,
+    defeated: defeatedInfo,
+    winner: winnerInfo,
+    nextTurn: {
+      side: battle.current.side,
+      hero: battle.current.hero,
+      villain: battle.current.villain
+    }
+  };
 }
 
 // NUEVO: Obtener batalla por ID (con registro completo)
 async function getTeamBattleById(battleId) {
+  // Obtener todas las batallas
   const battles = await getBattles();
-  return battles.find(b => b.id === battleId);
+  // Buscar la batalla por ID
+  const battle = battles.find(b => b.id === battleId);
+  if (!battle) return null;
+
+  // Obtener datos de héroes y villanos usando funciones asíncronas
+  const heroesData = await getHeroes();
+  const villainsData = await getVillains();
+
+  // Calcular héroes y villanos vivos y derrotados
+  const heroesAlive = (battle.teams.heroes || []).filter(h => h.hp > 0).map(h => h.id);
+  const villainsAlive = (battle.teams.villains || []).filter(v => v.hp > 0).map(v => v.id);
+  const heroesDefeated = (battle.teams.heroes || []).filter(h => h.hp === 0).map(h => h.id);
+  const villainsDefeated = (battle.teams.villains || []).filter(v => v.hp === 0).map(v => v.id);
+
+  // Siguiente en turno (los activos actuales)
+  const nextHero = battle.current?.hero || null;
+  const nextVillain = battle.current?.villain || null;
+
+  // Obtener datos de los personajes activos para mostrar nombre y alias
+  let attacker = null;
+  let defender = null;
+  let side = battle.current?.side || null;
+  if (side === 'heroes') {
+    attacker = heroesData.find(h => h.id === nextHero) || null;
+    defender = villainsData.find(v => v.id === nextVillain) || null;
+  } else if (side === 'villains') {
+    attacker = villainsData.find(v => v.id === nextVillain) || null;
+    defender = heroesData.find(h => h.id === nextHero) || null;
+  }
+
+  const currentTurn = {
+    side,
+    attacker: attacker ? { id: attacker.id, name: attacker.name, alias: attacker.alias } : null,
+    defender: defender ? { id: defender.id, name: defender.name, alias: defender.alias } : null
+  };
+
+  // Determinar el ganador o empate
+  let winner = battle.winner;
+  // Si la batalla terminó pero no hay ganador, verificar si ambos equipos quedaron sin personajes vivos
+  if (battle.finished && !winner) {
+    if (heroesAlive.length === 0 && villainsAlive.length === 0) {
+      winner = 'empate';
+    }
+  }
+
+  return {
+    ...battle,
+    heroesAlive,
+    villainsAlive,
+    heroesDefeated,
+    villainsDefeated,
+    nextHero,
+    nextVillain,
+    currentTurn,
+    winner // Siempre mostrar el bando ganador o empate si aplica
+  };
 }
 
 export default { 

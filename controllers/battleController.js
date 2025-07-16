@@ -191,8 +191,8 @@ router.post('/battle/:id/attack', async (req, res) => {
   try {
     const { id } = req.params;
     const { attacker, defender, attackType } = req.body;
-    const battle = await battleService.teamAttack(Number(id), attacker, defender, attackType);
-    res.status(200).json(battle);
+    const result = await battleService.teamAttack(Number(id), attacker, defender, attackType);
+    res.status(200).json(result);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
