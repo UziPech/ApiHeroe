@@ -7,7 +7,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/heroes:
+ * /heroes:
  *   get:
  *     summary: Obtiene todos los héroes
  *     tags: [Héroes]
@@ -32,7 +32,7 @@ router.get("/heroes", async (req, res) => {
 
 /**
  * @swagger
- * /api/heroes:
+ * /heroes:
  *   post:
  *     summary: Crea un nuevo héroe
  *     tags: [Héroes]
