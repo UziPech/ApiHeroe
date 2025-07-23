@@ -18,10 +18,10 @@ connectDB();
 
 const app = express();
 
-// Swagger configuration
+// Swagger configuration - SOLUCIÓN FINAL QUE FUNCIONA
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
-// Fix específico para Vercel - forzar la URL completa
+// Forzar la URL correcta
 swaggerSpec.servers = [
     {
         url: 'https://apiheroe.vercel.app',
@@ -29,20 +29,54 @@ swaggerSpec.servers = [
     }
 ];
 
-// Configuración básica que funciona
-app.use('/api-docs', swaggerUi.serve);
-app.get('/api-docs', swaggerUi.setup(swaggerSpec, {
-    explorer: true,
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: "SuperHeroes API Documentation",
-    swaggerOptions: {
-        validatorUrl: null,
-        tryItOutEnabled: true,
-        filter: true,
-        displayOperationId: false,
-        displayRequestDuration: true
-    }
-}));
+// Endpoint para el JSON de Swagger
+app.get('/swagger.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(swaggerSpec);
+});
+
+// Swagger UI que SÍ funciona en Vercel
+app.get('/api-docs', (req, res) => {
+    res.send(`
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>SuperHeroes API - Swagger Documentation</title>
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui.css" />
+  <style>
+    html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
+    *, *:before, *:after { box-sizing: inherit; }
+    body { margin:0; background: #fafafa; }
+    .swagger-ui .topbar { display: none !important; }
+  </style>
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-bundle.js"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-standalone-preset.js"></script>
+  <script>
+    window.onload = function() {
+      const ui = SwaggerUIBundle({
+        url: '/swagger.json',
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "StandaloneLayout",
+        validatorUrl: null
+      });
+    };
+  </script>
+</body>
+</html>
+    `);
+});
 
 // Documentación alternativa que SÍ funciona en Vercel
 app.get('/docs', (req, res) => {
