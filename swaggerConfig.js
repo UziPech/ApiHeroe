@@ -154,7 +154,15 @@ const options = {
       },
     ],
   },
-  apis: ['./controllers/*.js', './routes/*.js'],
+  apis: [
+    './controllers/heroController.js',
+    './controllers/villainController.js', 
+    './controllers/userController.js',
+    './controllers/battleController.js',
+    './controllers/duelController.js',
+    './routes/battleRoutes.js',
+    './routes/duelRoutes.js'
+  ],
 };
 
 export default options;
