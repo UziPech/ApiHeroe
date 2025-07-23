@@ -1,4 +1,5 @@
 import express from 'express';
+import dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerOptions from './swaggerConfig.js';
@@ -8,6 +9,9 @@ import duelRoutes from './routes/duelRoutes.js';
 import heroController from './controllers/heroController.js';
 import villainController from './controllers/villainController.js';
 import userController from './controllers/userController.js';
+
+// Configurar variables de entorno
+dotenv.config();
 
 // Conectar a MongoDB Atlas al iniciar la app
 connectDB();
@@ -33,3 +37,6 @@ app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);
     console.log(`Swagger disponible en http://localhost:${PORT}/api-docs`);
 });
+
+// Export para Vercel
+export default app;
