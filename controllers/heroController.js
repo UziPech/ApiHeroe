@@ -1,5 +1,6 @@
 import express from "express";
-i * @swagger
+/**
+ * @swagger
  * /heroes:
  *   post:
  *     summary: Crea un nuevo héroe

@@ -1,5 +1,6 @@
 import express from "express";
-i * @swagger
+/**
+ * @swagger
  * /villains:
  *   post:
  *     summary: Crea un nuevo villano
