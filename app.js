@@ -29,14 +29,17 @@ swaggerSpec.servers = [
     }
 ];
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-    explorer: true,
-    customCss: '.swagger-ui .topbar { display: none }',
-    swaggerOptions: {
-        url: null,
-        spec: swaggerSpec
-    }
-}));
+// Ruta para servir el JSON de especificación
+app.get('/api-docs-json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.send(swaggerSpec);
+});
+
+// Ruta para la documentación HTML personalizada
+app.get('/api-docs', (req, res) => {
+    res.sendFile('swagger.html', { root: 'public' });
+});
 
 app.use(express.json());
 app.use(express.static('public'));
