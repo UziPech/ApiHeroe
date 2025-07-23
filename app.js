@@ -22,11 +22,11 @@ const app = express();
 // Swagger configuration - SOLUCIÓN FINAL QUE FUNCIONA
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
-// Forzar la URL correcta
+// Forzar la URL correcta - usar URL dinámica de Vercel
 swaggerSpec.servers = [
     {
-        url: 'https://apiheroe-nq4iqhwzg-uziels-projects-fa4bbf7c.vercel.app/api',
-        description: 'Servidor de producción en Vercel'
+        url: `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/api`,
+        description: 'Servidor automático'
     }
 ];
 
