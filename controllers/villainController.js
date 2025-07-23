@@ -1,5 +1,26 @@
 import express from "express";
-import { check, validationResult } from 'express-validator';
+i * @swagger
+ * /villains:
+ *   post:
+ *     summary: Crea un nuevo villano
+ *     tags: [Villains]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/VillainCreate'
+ *     responses:
+ *       201:
+ *         description: Villano creado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Villain'
+ *       400:
+ *         description: Error de validación - nombre y alias son requeridos
+ *       500:
+ *         description: Error interno del servidoralidationResult } from 'express-validator';
 import villainService from "../services/villainService.js";
 import Villain from "../models/villainModel.js";
 
@@ -60,18 +81,21 @@ router.post("/villains",
         }
         try {
             const { name, alias, city, team } = req.body;
-            // Obtener el último ID para generar uno nuevo
+            // Obtener el último ID para generar uno nuevo (incremental automático)
             const lastVillain = await Villain.findOne().sort({ id: -1 });
             const newId = lastVillain ? lastVillain.id + 1 : 1;
+            
+            // Generar poder aleatorio entre 1 y 100
+            const randomPower = Math.floor(Math.random() * 100) + 1;
             
             // Crear nuevo villano usando el modelo de Mongoose
             const newVillain = new Villain({
                 id: newId,
                 name,
                 alias,
+                power: randomPower,
                 city: city || '',
-                team: team || '',
-                power: 50 // Valor por defecto para power
+                team: team || ''
             });
             const addedVillain = await newVillain.save();
             res.status(201).json(addedVillain);

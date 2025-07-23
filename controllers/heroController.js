@@ -1,5 +1,26 @@
 import express from "express";
-import { check, validationResult } from 'express-validator';
+i * @swagger
+ * /heroes:
+ *   post:
+ *     summary: Crea un nuevo héroe
+ *     tags: [Heroes]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/HeroCreate'
+ *     responses:
+ *       201:
+ *         description: Héroe creado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Hero'
+ *       400:
+ *         description: Error de validación - nombre y alias son requeridos
+ *       500:
+ *         description: Error interno del servidoralidationResult } from 'express-validator';
 import heroService from "../services/heroService.js";
 import Hero from "../models/heroModel.js";
 
@@ -60,18 +81,21 @@ router.post("/heroes",
         }
         try {
             const { name, alias, city, team } = req.body;
-            // Obtener el último ID para generar uno nuevo
+            // Obtener el último ID para generar uno nuevo (incremental automático)
             const lastHero = await Hero.findOne().sort({ id: -1 });
             const newId = lastHero ? lastHero.id + 1 : 1;
+            
+            // Generar poder aleatorio entre 1 y 100
+            const randomPower = Math.floor(Math.random() * 100) + 1;
             
             // Crear nuevo héroe usando el modelo de Mongoose
             const newHero = new Hero({
                 id: newId,
                 name,
                 alias,
+                power: randomPower,
                 city: city || '',
-                team: team || '',
-                power: 50 // Valor por defecto para power
+                team: team || ''
             });
             const addedHero = await newHero.save();
             res.status(201).json(addedHero);
