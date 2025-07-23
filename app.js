@@ -23,6 +23,22 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(express.json());
 app.use(express.static('public'));
+
+// Ruta de prueba
+app.get('/', (req, res) => {
+    res.json({ 
+        message: 'API de Superhéroes funcionando correctamente',
+        swagger: '/api-docs',
+        endpoints: {
+            heroes: '/api/heroes',
+            villains: '/api/villains',
+            users: '/api/users',
+            battles: '/api/battles',
+            duels: '/api/duels'
+        }
+    });
+});
+
 app.use('/api', heroController);
 app.use('/api', villainController);
 // Las rutas de usuarios (login y register) NO están protegidas
