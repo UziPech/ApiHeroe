@@ -21,21 +21,22 @@ const app = express();
 // Swagger configuration
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
-// Ruta para servir el swagger.json
-app.get('/api-docs/swagger.json', (req, res) => {
-    res.setHeader('Content-Type', 'application/json');
-    res.send(swaggerSpec);
-});
+// Fix para Vercel: asegurar que la URL del servidor esté correcta
+swaggerSpec.servers = [
+    {
+        url: 'https://apiheroe.vercel.app',
+        description: 'Servidor de producción en Vercel'
+    }
+];
 
-// Configuración mejorada de Swagger UI
-app.use('/api-docs', swaggerUi.serve);
-app.get('/api-docs', (req, res) => {
-    res.send(swaggerUi.generateHTML(swaggerSpec, {
-        explorer: true,
-        customCss: '.swagger-ui .topbar { display: none }',
-        customSiteTitle: "SuperHeroes API Documentation"
-    }));
-});
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    explorer: true,
+    customCss: '.swagger-ui .topbar { display: none }',
+    swaggerOptions: {
+        url: null,
+        spec: swaggerSpec
+    }
+}));
 
 app.use(express.json());
 app.use(express.static('public'));
