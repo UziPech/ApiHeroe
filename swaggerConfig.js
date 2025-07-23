@@ -9,7 +9,7 @@ const options = {
     servers: [
       {
         url: process.env.NODE_ENV === 'production' 
-          ? 'https://apiheroe.vercel.app' 
+          ? 'https://apiheroe-854sjd386-uziels-projects-fa4bbf7c.vercel.app' 
           : 'http://localhost:3000',
         description: process.env.NODE_ENV === 'production' ? 'Servidor de producción en Vercel' : 'Servidor de desarrollo'
       },

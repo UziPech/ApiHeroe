@@ -56,3 +56,4 @@ yarn.lock
 
 # VSCode settings
 .vscode/ 
+.vercel
