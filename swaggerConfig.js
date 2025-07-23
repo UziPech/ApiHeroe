@@ -8,7 +8,7 @@ const options = {
     },
     servers: [
       {
-        url: 'https://apiheroe-6hflbzzrh-uziels-projects-fa4bbf7c.vercel.app',
+        url: 'https://apiheroe.vercel.app',
         description: 'Servidor de producción en Vercel'
       },
     ],
