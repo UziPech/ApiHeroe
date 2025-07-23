@@ -55,24 +55,6 @@ router.get("/heroes", async (req, res) => {
     }
 });
 
-/**
- * @swagger
- * /heroes:
- *   post:
- *     summary: Crea un nuevo héroe
- *     tags: [Héroes]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Hero'
- *     responses:
- *       201:
- *         description: Héroe creado
- *       400:
- *         description: Error de validación
- */
 router.post("/heroes",
     [
         check('name').not().isEmpty().withMessage('El nombre es requerido'),

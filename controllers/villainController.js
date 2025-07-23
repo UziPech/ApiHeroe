@@ -55,24 +55,6 @@ router.get("/villains", async (req, res) => {
     }
 });
 
-/**
- * @swagger
- * /villains:
- *   post:
- *     summary: Crea un nuevo villano
- *     tags: [Villanos]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Villain'
- *     responses:
- *       201:
- *         description: Villano creado
- *       400:
- *         description: Error de validación
- */
 router.post("/villains",
     [
         check('name').not().isEmpty().withMessage('El nombre es requerido'),
