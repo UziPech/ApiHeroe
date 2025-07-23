@@ -8,12 +8,8 @@ const options = {
     },
     servers: [
       {
-        url: process.env.VERCEL_URL 
-          ? `https://${process.env.VERCEL_URL}` 
-          : process.env.NODE_ENV === 'production' 
-            ? 'https://apiheroe-854sjd386-uziels-projects-fa4bbf7c.vercel.app' 
-            : 'http://localhost:3000',
-        description: process.env.VERCEL_URL ? 'Servidor de producción en Vercel' : 'Servidor de desarrollo'
+        url: 'https://apiheroe-qxjg5x0wd-uziels-projects-fa4bbf7c.vercel.app',
+        description: 'Servidor de producción en Vercel'
       },
     ],
     components: {
