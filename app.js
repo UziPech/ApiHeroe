@@ -24,7 +24,7 @@ const swaggerSpec = swaggerJSDoc(swaggerOptions);
 // Forzar la URL correcta
 swaggerSpec.servers = [
     {
-        url: 'https://apiheroe.vercel.app',
+        url: 'https://apiheroe.vercel.app/api',
         description: 'Servidor de producción en Vercel'
     }
 ];
