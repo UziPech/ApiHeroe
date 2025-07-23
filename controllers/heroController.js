@@ -35,7 +35,7 @@ const router = express.Router();
  * /heroes:
  *   get:
  *     summary: Obtiene todos los héroes
- *     tags: [Héroes]
+ *     tags: [Heroes]
  *     responses:
  *       200:
  *         description: Lista de héroes
@@ -95,7 +95,7 @@ router.post("/heroes",
  * /heroes/{id}:
  *   put:
  *     summary: Actualiza un héroe existente
- *     tags: [Héroes]
+ *     tags: [Heroes]
  *     parameters:
  *       - in: path
  *         name: id
@@ -133,7 +133,7 @@ router.put("/heroes/:id", async (req, res) => {
  * /heroes/{id}:
  *   delete:
  *     summary: Elimina un héroe
- *     tags: [Héroes]
+ *     tags: [Heroes]
  *     parameters:
  *       - in: path
  *         name: id
@@ -165,7 +165,7 @@ router.delete('/heroes/:id', async (req, res) => {
  * /heroes/city/{city}:
  *   get:
  *     summary: Busca héroes por ciudad
- *     tags: [Héroes]
+ *     tags: [Heroes]
  *     parameters:
  *       - in: path
  *         name: city

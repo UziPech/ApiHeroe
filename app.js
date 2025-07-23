@@ -24,7 +24,7 @@ const swaggerSpec = swaggerJSDoc(swaggerOptions);
 // Forzar la URL correcta
 swaggerSpec.servers = [
     {
-        url: 'https://apiheroe.vercel.app/api',
+        url: 'https://apiheroe-cj05s3khd-uziels-projects-fa4bbf7c.vercel.app/api',
         description: 'Servidor de producción en Vercel'
     }
 ];
@@ -107,47 +107,47 @@ app.get('/docs', (req, res) => {
         <h1>🦸 SuperHeroes API Documentation</h1>
         
         <div style="text-align: center; background: #3498db; color: white; padding: 15px; border-radius: 5px; margin-bottom: 30px;">
-            <strong>API Base URL:</strong> https://apiheroe.vercel.app
+            <strong>API Base URL:</strong> https://apiheroe-cj05s3khd-uziels-projects-fa4bbf7c.vercel.app
         </div>
 
         <h2>📋 Endpoints Disponibles</h2>
         
         <div class="endpoint">
             <span class="method get">GET</span>
-            <span class="url">https://apiheroe.vercel.app/</span>
+            <span class="url">https://apiheroe-cj05s3khd-uziels-projects-fa4bbf7c.vercel.app/</span>
             <p>Estado de la API</p>
-            <a href="https://apiheroe.vercel.app/" class="test-link" target="_blank">✅ Probar Ahora</a>
+            <a href="https://apiheroe-cj05s3khd-uziels-projects-fa4bbf7c.vercel.app/" class="test-link" target="_blank">✅ Probar Ahora</a>
         </div>
 
         <div class="endpoint">
             <span class="method get">GET</span>
-            <span class="url">https://apiheroe.vercel.app/api/heroes</span>
+            <span class="url">https://apiheroe-cj05s3khd-uziels-projects-fa4bbf7c.vercel.app/api/heroes</span>
             <p>Obtener todos los héroes</p>
-            <a href="https://apiheroe.vercel.app/api/heroes" class="test-link" target="_blank">✅ Probar Ahora</a>
+            <a href="https://apiheroe-cj05s3khd-uziels-projects-fa4bbf7c.vercel.app/api/heroes" class="test-link" target="_blank">✅ Probar Ahora</a>
         </div>
 
         <div class="endpoint">
             <span class="method get">GET</span>
-            <span class="url">https://apiheroe.vercel.app/api/villains</span>
+            <span class="url">https://apiheroe-cj05s3khd-uziels-projects-fa4bbf7c.vercel.app/api/villains</span>
             <p>Obtener todos los villanos</p>
-            <a href="https://apiheroe.vercel.app/api/villains" class="test-link" target="_blank">✅ Probar Ahora</a>
+            <a href="https://apiheroe-cj05s3khd-uziels-projects-fa4bbf7c.vercel.app/api/villains" class="test-link" target="_blank">✅ Probar Ahora</a>
         </div>
 
         <div class="endpoint">
             <span class="method post">POST</span>
-            <span class="url">https://apiheroe.vercel.app/api/users/register</span>
+            <span class="url">https://apiheroe-cj05s3khd-uziels-projects-fa4bbf7c.vercel.app/api/users/register</span>
             <p>Registrar usuario</p>
         </div>
 
         <div class="endpoint">
             <span class="method post">POST</span>
-            <span class="url">https://apiheroe.vercel.app/api/users/login</span>
+            <span class="url">https://apiheroe-cj05s3khd-uziels-projects-fa4bbf7c.vercel.app/api/users/login</span>
             <p>Iniciar sesión</p>
         </div>
 
         <div class="endpoint">
             <span class="method post">POST</span>
-            <span class="url">https://apiheroe.vercel.app/api/battles/start</span>
+            <span class="url">https://apiheroe-cj05s3khd-uziels-projects-fa4bbf7c.vercel.app/api/battles/start</span>
             <p>Iniciar batalla 3v3 (requiere autenticación)</p>
         </div>
 
@@ -156,7 +156,7 @@ app.get('/docs', (req, res) => {
         
         <p style="margin-top: 20px; text-align: center;">
             <strong>Para tu presentación académica, usa esta URL:</strong><br>
-            <a href="https://apiheroe.vercel.app/docs" style="font-size: 18px;">https://apiheroe.vercel.app/docs</a>
+            <a href="https://apiheroe-cj05s3khd-uziels-projects-fa4bbf7c.vercel.app/docs" style="font-size: 18px;">https://apiheroe-cj05s3khd-uziels-projects-fa4bbf7c.vercel.app/docs</a>
         </p>
     </div>
 </body>
@@ -166,6 +166,19 @@ app.get('/docs', (req, res) => {
 
 app.use(express.json());
 app.use(express.static('public'));
+
+// Configuración CORS para Vercel
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    
+    if (req.method === 'OPTIONS') {
+        res.sendStatus(200);
+    } else {
+        next();
+    }
+});
 
 // Ruta de prueba
 app.get('/', (req, res) => {

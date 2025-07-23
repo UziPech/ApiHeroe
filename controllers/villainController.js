@@ -35,7 +35,7 @@ const router = express.Router();
  * /villains:
  *   get:
  *     summary: Obtiene todos los villanos
- *     tags: [Villanos]
+ *     tags: [Villains]
  *     responses:
  *       200:
  *         description: Lista de villanos
@@ -95,7 +95,7 @@ router.post("/villains",
  * /villains/{id}:
  *   put:
  *     summary: Actualiza un villano existente
- *     tags: [Villanos]
+ *     tags: [Villains]
  *     parameters:
  *       - in: path
  *         name: id
@@ -133,7 +133,7 @@ router.put("/villains/:id", async (req, res) => {
  * /villains/{id}:
  *   delete:
  *     summary: Elimina un villano
- *     tags: [Villanos]
+ *     tags: [Villains]
  *     parameters:
  *       - in: path
  *         name: id
@@ -165,7 +165,7 @@ router.delete('/villains/:id', async (req, res) => {
  * /villains/city/{city}:
  *   get:
  *     summary: Busca villanos por ciudad
- *     tags: [Villanos]
+ *     tags: [Villains]
  *     parameters:
  *       - in: path
  *         name: city
