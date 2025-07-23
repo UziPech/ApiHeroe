@@ -21,6 +21,28 @@ const options = {
         },
       },
       schemas: {
+        Hero: {
+          type: 'object',
+          properties: {
+            id: { type: 'number', example: 1 },
+            name: { type: 'string', example: 'Superman' },
+            alias: { type: 'string', example: 'Clark Kent' },
+            power: { type: 'number', example: 100 },
+            level: { type: 'number', example: 1 },
+            defense: { type: 'number', example: 50 }
+          }
+        },
+        Villain: {
+          type: 'object',
+          properties: {
+            id: { type: 'number', example: 101 },
+            name: { type: 'string', example: 'Joker' },
+            alias: { type: 'string', example: 'Joker' },
+            power: { type: 'number', example: 90 },
+            level: { type: 'number', example: 1 },
+            defense: { type: 'number', example: 40 }
+          }
+        },
         CharacterState: {
           type: 'object',
           properties: {
@@ -132,7 +154,7 @@ const options = {
       },
     ],
   },
-  apis: ['./routes/*.js', './controllers/*.js'],
+  apis: ['./controllers/*.js', './routes/*.js'],
 };
 
 export default options;

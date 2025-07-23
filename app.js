@@ -18,8 +18,12 @@ connectDB();
 
 const app = express();
 
+// Swagger configuration
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    explorer: true,
+    customCss: '.swagger-ui .topbar { display: none }'
+}));
 
 app.use(express.json());
 app.use(express.static('public'));
