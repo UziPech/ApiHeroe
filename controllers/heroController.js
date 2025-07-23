@@ -1,4 +1,10 @@
 import express from "express";
+import { check, validationResult } from 'express-validator';
+import heroService from "../services/heroService.js";
+import Hero from "../models/heroModel.js";
+
+const router = express.Router();
+
 /**
  * @swagger
  * /heroes:
@@ -21,11 +27,8 @@ import express from "express";
  *       400:
  *         description: Error de validación - nombre y alias son requeridos
  *       500:
- *         description: Error interno del servidoralidationResult } from 'express-validator';
-import heroService from "../services/heroService.js";
-import Hero from "../models/heroModel.js";
-
-const router = express.Router();
+ *         description: Error interno del servidor
+ */
 
 /**
  * @swagger
