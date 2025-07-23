@@ -44,6 +44,11 @@ app.get('/api-docs', swaggerUi.setup(swaggerSpec, {
     }
 }));
 
+// Documentación alternativa que SÍ funciona en Vercel
+app.get('/docs', (req, res) => {
+    res.sendFile('docs.html', { root: 'public' });
+});
+
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -52,6 +57,7 @@ app.get('/', (req, res) => {
     res.json({ 
         message: 'API de Superhéroes funcionando correctamente',
         swagger: '/api-docs',
+        documentation: '/docs',
         endpoints: {
             heroes: '/api/heroes',
             villains: '/api/villains',
