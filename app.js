@@ -20,10 +20,22 @@ const app = express();
 
 // Swagger configuration
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-    explorer: true,
-    customCss: '.swagger-ui .topbar { display: none }'
-}));
+
+// Ruta para servir el swagger.json
+app.get('/api-docs/swagger.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(swaggerSpec);
+});
+
+// Configuración mejorada de Swagger UI
+app.use('/api-docs', swaggerUi.serve);
+app.get('/api-docs', (req, res) => {
+    res.send(swaggerUi.generateHTML(swaggerSpec, {
+        explorer: true,
+        customCss: '.swagger-ui .topbar { display: none }',
+        customSiteTitle: "SuperHeroes API Documentation"
+    }));
+});
 
 app.use(express.json());
 app.use(express.static('public'));
