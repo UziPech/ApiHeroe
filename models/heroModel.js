@@ -1,13 +1,12 @@
-// Modelo de datos de héroe
+import mongoose from 'mongoose';
 
-class Hero {
-    constructor(id, name, alias, city, team) {
-        this.id = id;
-        this.name = name;
-        this.alias = alias;
-        this.city = city;
-        this.team = team;
-    }
-}
+const heroSchema = new mongoose.Schema({
+  id: { type: Number, required: true, unique: true },
+  name: { type: String, required: true },
+  alias: { type: String, required: true },
+  power: { type: Number, required: true },
+  city: { type: String, default: '' },
+  team: { type: String, default: '' }
+}, { collection: 'heroes' });
 
-export default Hero;
+export default mongoose.model('Hero', heroSchema);

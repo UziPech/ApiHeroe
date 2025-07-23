@@ -1,65 +1,49 @@
 // controllers/battleController.js
 import express from 'express';
 import battleService from '../services/battleService.js';
+import Battle from '../models/battleModel.js'; // Added import for Battle model
 
 const router = express.Router();
 
-/**
- * @swagger
- * /battle/duel/{heroId}/{villainId}:
- *   post:
- *     summary: Enfrenta a un héroe contra un villano y determina al ganador
- *     tags: [Batallas]
- *     parameters:
- *       - in: path
- *         name: heroId
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID del héroe
- *       - in: path
- *         name: villainId
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID del villano
- *     responses:
- *       201:
- *         description: Resultado de la batalla
- *       400:
- *         description: Error al realizar la batalla
- *       404:
- *         description: Héroe o villano no encontrado
- */
-router.post('/battle/duel/:heroId/:villainId', async (req, res) => {
-  try {
-    const { heroId, villainId } = req.params;
-    const battle = await battleService.fight(parseInt(heroId), parseInt(villainId));
-    res.status(201).json(battle);
-  } catch (error) {
-    if (error.message.includes('no encontrado')) {
-      res.status(404).json({ error: error.message });
-    } else {
-      res.status(400).json({ error: error.message });
-    }
-  }
-});
 
 /**
  * @swagger
  * /battles:
  *   get:
- *     summary: Obtiene el historial completo de batallas
+ *     summary: Obtiene el historial completo de batallas del usuario autenticado
  *     tags: [Batallas]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Lista de todas las batallas
+ *       401:
+ *         description: No autenticado
  */
 router.get('/battles', async (req, res) => {
   try {
+    // Obtiene todas las batallas usando el servicio
     const battles = await battleService.getBattleHistory();
-    res.status(200).json(battles);
+    // Filtra cada batalla para mostrar solo los campos relevantes y ocultar _id y __v
+    const battlesFiltered = battles.map(battle => ({
+      // id entero generado por el backend
+      id: battle.id,
+      // userId del usuario dueño de la batalla
+      userId: battle.userId,
+      // equipos de héroes y villanos
+      teams: battle.teams,
+      // Si existen, incluye los siguientes campos (para batallas por equipos)
+      userSide: battle.userSide,
+      firstHero: battle.firstHero,
+      firstVillain: battle.firstVillain,
+      current: battle.current,
+      // Puedes agregar aquí otros campos que sí quieras mostrar
+      // winner: battle.winner, etc.
+    }));
+    // Devuelve la respuesta filtrada
+    res.status(200).json(battlesFiltered);
   } catch (error) {
+    // Si ocurre un error, responde con error 500
     res.status(500).json({ error: error.message });
   }
 });
@@ -68,8 +52,10 @@ router.get('/battles', async (req, res) => {
  * @swagger
  * /battles/{battleId}:
  *   get:
- *     summary: Obtiene una batalla específica por su ID
+ *     summary: Obtiene una batalla específica por su ID (solo si pertenece al usuario autenticado)
  *     tags: [Batallas]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: battleId
@@ -80,16 +66,19 @@ router.get('/battles', async (req, res) => {
  *     responses:
  *       200:
  *         description: Detalles de la batalla
+ *       401:
+ *         description: No autenticado
  *       404:
  *         description: Batalla no encontrada
  */
 router.get('/battles/:battleId', async (req, res) => {
   try {
     const { battleId } = req.params;
-    const battle = await battleService.getBattleById(parseInt(battleId));
+    // Buscar batalla que pertenezca al usuario autenticado
+    const battle = await battleService.getBattleById(parseInt(battleId), req.userId);
     
     if (!battle) {
-      return res.status(404).json({ error: 'Batalla no encontrada' });
+      return res.status(404).json({ error: 'Batalla no encontrada o no tienes acceso a ella' });
     }
     
     res.status(200).json(battle);
@@ -100,10 +89,12 @@ router.get('/battles/:battleId', async (req, res) => {
 
 /**
  * @swagger
- * /battle/team:
+ * /battles/team:
  *   post:
  *     summary: Crea una batalla por equipos (3 héroes vs 3 villanos)
  *     tags: [Batallas]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -132,14 +123,35 @@ router.get('/battles/:battleId', async (req, res) => {
  *               villainConfig:
  *                 type: object
  *                 description: Configuración personalizada de niveles y defensa para villanos
-
  *     responses:
  *       201:
- *         description: Batalla creada
+ *         description: |
+ *           Batalla por equipos creada exitosamente. 
+ *           
+ *           **Sistema de combate 3v3:**
+ *           - Combate por turnos con contraataques automáticos de la IA
+ *           - Cambio automático de personaje cuando uno muere
+ *           - Seguimiento detallado de HP antes y después de cada ataque
+ *           
+ *           **Posibles resultados de batalla:**
+ *           - `winner: "heroes"` - Los héroes eliminan a todos los villanos
+ *           - `winner: "villains"` - Los villanos eliminan a todos los héroes
+ *           - `winner: "empate"` - Ambos equipos son eliminados simultáneamente
+ *           - `winner: null` - La batalla está en progreso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/BattleState'
+ *       401:
+ *         description: No autenticado
  */
-router.post('/battle/team', async (req, res) => {
+router.post('/battles/team', async (req, res) => {
+  if (!req.userId) {
+    return res.status(401).json({ error: 'No autenticado' });
+  }
   try {
     const { heroes, villains, userSide, firstHero, firstVillain, heroConfig, villainConfig } = req.body;
+    const userId = req.userId;
     const battle = await battleService.createTeamBattle({ 
       heroes, 
       villains, 
@@ -148,7 +160,7 @@ router.post('/battle/team', async (req, res) => {
       firstVillain,
       heroConfig,
       villainConfig
-    });
+    }, userId);
     res.status(201).json(battle);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -157,10 +169,12 @@ router.post('/battle/team', async (req, res) => {
 
 /**
  * @swagger
- * /battle/{id}/attack:
+ * /battles/{id}/attack:
  *   post:
- *     summary: Realiza un ataque en una batalla por equipos
+ *     summary: Realiza un ataque en una batalla por equipos (con contraataque automático de la IA)
  *     tags: [Batallas]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -177,33 +191,66 @@ router.post('/battle/team', async (req, res) => {
  *             properties:
  *               attacker:
  *                 type: integer
- *               defender:
- *                 type: integer
+ *                 description: ID del personaje que ataca. Debe ser el personaje activo según el turno actual.
  *               attackType:
  *                 type: string
- *                 enum: [basico, especial, critico]
- *                 description: Tipo de ataque a realizar (Básico, Especial, Crítico)
+ *                 description: Tipo de ataque (ej. "basico", "critico", "especial").
+ *                 example: "basico"
  *     responses:
  *       200:
- *         description: Acción realizada
+ *         description: |
+ *           Acción realizada exitosamente. La respuesta incluye:
+ *           - El ataque del jugador
+ *           - El contraataque automático de la IA (si queda viva)
+ *           - Cambio automático de personaje activo si el actual muere
+ *           - Estado actualizado completo de la batalla
+ *           - Detección automática de empate cuando ambos equipos son eliminados
+ *           
+ *           **Posibles resultados de batalla:**
+ *           - `winner: "heroes"` - Los héroes ganan
+ *           - `winner: "villains"` - Los villanos ganan  
+ *           - `winner: "empate"` - Ambos equipos fueron eliminados simultáneamente
+ *           - `winner: null` - La batalla aún continúa
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 battle:
+ *                   $ref: '#/components/schemas/BattleState'
+ *       400:
+ *         description: Petición inválida (ej. turno incorrecto, personaje no válido, falta un parámetro).
+ *       404:
+ *         description: Batalla no encontrada.
  */
-router.post('/battle/:id/attack', async (req, res) => {
+router.post('/battles/:id/attack', async (req, res) => {
   try {
     const { id } = req.params;
-    const { attacker, defender, attackType } = req.body;
-    const result = await battleService.teamAttack(Number(id), attacker, defender, attackType);
-    res.status(200).json(result);
+    const { attacker: attackerId, attackType } = req.body;
+
+    if (attackerId === undefined || !attackType) {
+      return res.status(400).json({ error: 'Se requiere el ID del "attacker" y el "attackType".' });
+    }
+
+    const result = await battleService.performAttack(Number(id), Number(attackerId), attackType);
+    res.status(200).json({ battle: result });
   } catch (error) {
+    if (error.message.includes('no encontrada')) {
+      return res.status(404).json({ error: error.message });
+    }
+    // Errores de lógica de negocio (turno incorrecto, etc.)
     res.status(400).json({ error: error.message });
   }
 });
 
 /**
  * @swagger
- * /battle/{id}:
+ * /battle/:id:
  *   get:
- *     summary: Obtiene el registro completo de una batalla por equipos
+ *     summary: Obtiene el registro completo de una batalla por equipos (solo si pertenece al usuario autenticado)
  *     tags: [Batallas]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -214,16 +261,32 @@ router.post('/battle/:id/attack', async (req, res) => {
  *     responses:
  *       200:
  *         description: Registro de la batalla
+ *       401:
+ *         description: No autenticado
+ *       404:
+ *         description: Batalla no encontrada
  */
 router.get('/battle/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const battle = await battleService.getTeamBattleById(Number(id));
-    if (!battle) return res.status(404).json({ error: 'Batalla no encontrada' });
+    // Buscar batalla que pertenezca al usuario autenticado
+    const battle = await battleService.getBattleById(Number(id), req.userId);
+    if (!battle) return res.status(404).json({ error: 'Batalla no encontrada o no tienes acceso a ella' });
     res.status(200).json(battle);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 });
+
+// Endpoint protegido: obtener batallas del usuario autenticado
+export const getBattlesByUser = async (req, res) => {
+  try {
+    // Busca batallas en MongoDB donde el userId coincida con el del token
+    const battles = await Battle.find({ userId: req.userId });
+    res.json(battles);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al obtener batallas del usuario' });
+  }
+};
 
 export default router;

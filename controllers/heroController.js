@@ -60,8 +60,20 @@ router.post("/heroes",
         }
         try {
             const { name, alias, city, team } = req.body;
-            const newHero = new Hero(null, name, alias, city, team);
-            const addedHero = await heroService.addHero(newHero);
+            // Obtener el último ID para generar uno nuevo
+            const lastHero = await Hero.findOne().sort({ id: -1 });
+            const newId = lastHero ? lastHero.id + 1 : 1;
+            
+            // Crear nuevo héroe usando el modelo de Mongoose
+            const newHero = new Hero({
+                id: newId,
+                name,
+                alias,
+                city: city || '',
+                team: team || '',
+                power: 50 // Valor por defecto para power
+            });
+            const addedHero = await newHero.save();
             res.status(201).json(addedHero);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -172,101 +184,6 @@ router.get('/heroes/city/:city', async (req, res) => {
         res.json(heroes);
     } catch (err) {
         res.status(500).json({ error: err.message });
-    }
-});
-
-/**
- * @swagger
- * /heroes/enfrentar:
- *   post:
- *     summary: Enfrenta uno o varios héroes contra un villano
- *     tags: [Héroes]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               heroIds:
- *                 oneOf:
- *                   - type: array
- *                     items:
- *                       type: integer
- *                   - type: integer
- *                 description: ID(s) de los héroes
- *               villain:
- *                 type: string
- *                 description: Nombre del villano
- *     responses:
- *       200:
- *         description: Resultado del enfrentamiento
- *       400:
- *         description: Faltan datos
- *       404:
- *         description: Héroe(s) no encontrado(s)
- */
-// Adaptado: enfrentar varios héroes a un villano
-router.post('/heroes/enfrentar', async (req, res) => {
-    // Espera body: { heroIds: [1,2,3], villain: "nombre" }
-    try {
-        const { heroIds, villain } = req.body;
-        if (!heroIds || !villain) {
-            return res.status(400).json({ error: 'Se requieren heroIds y villain' });
-        }
-        const result = await heroService.faceVillain(heroIds, villain);
-        res.json({ message: result });
-    } catch (err) {
-        res.status(404).json({ error: err.message });
-    }
-});
-
-/**
- * @swagger
- * /heroes/enfrentar-villano:
- *   post:
- *     summary: Enfrenta uno o varios héroes contra un villano (solo 1 villano permitido)
- *     tags: [Héroes]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               heroIds:
- *                 oneOf:
- *                   - type: array
- *                     items:
- *                       type: integer
- *                   - type: integer
- *                 description: ID(s) de los héroes
- *               villainId:
- *                 oneOf:
- *                   - type: array
- *                     items:
- *                       type: integer
- *                   - type: integer
- *                 description: ID del villano (solo uno permitido)
- *     responses:
- *       200:
- *         description: Resultado del enfrentamiento
- *       400:
- *         description: Faltan datos o combinación no permitida
- *       404:
- *         description: Héroe(s) o villano no encontrado(s)
- */
-router.post('/heroes/enfrentar-villano', async (req, res) => {
-    // Espera body: { heroIds: [1,2,3], villainId: 1 }
-    try {
-        const { heroIds, villainId } = req.body;
-        if (!heroIds || !villainId) {
-            return res.status(400).json({ error: 'Se requieren heroIds y villainId' });
-        }
-        const result = await heroService.faceVillainVsHero(heroIds, villainId);
-        res.json({ message: result });
-    } catch (err) {
-        res.status(400).json({ error: err.message });
     }
 });
 

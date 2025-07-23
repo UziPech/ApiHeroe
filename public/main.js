@@ -108,50 +108,7 @@ document.getElementById('heroes-select').addEventListener('change', updateFirstA
 document.getElementById('villains-select').addEventListener('change', updateFirstAttackerDefenderOptions);
 document.getElementById('user-side').addEventListener('change', updateFirstAttackerDefenderOptions);
 
-// Al crear batalla individual, enviar quién ataca primero
-async function createBattleIndividual(e) {
-  e.preventDefault();
-  const heroId = document.getElementById('hero-select-individual').value;
-  const villainId = document.getElementById('villain-select-individual').value;
-  const firstAttacker = document.getElementById('first-attacker-individual').value;
-  const resultDiv = document.getElementById('duel-result');
-  if (resultDiv) resultDiv.innerHTML = '';
-  if (!heroId || !villainId) {
-    alert('Selecciona un héroe y un villano.');
-    return;
-  }
-  // Determinar quién ataca primero
-  let body = {};
-  if (firstAttacker === 'hero') {
-    body = { firstHero: heroId, firstVillain: villainId };
-  } else {
-    body = { firstHero: villainId, firstVillain: heroId };
-  }
-  const res = await fetch(`/api/battle/duel/${heroId}/${villainId}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  if (res.ok) {
-    const data = await res.json();
-    let msg = `<div style='margin-top:1em;padding:1em;background:#eafbe7;border-radius:8px;border:1px solid #b2e2b2;'>`;
-    msg += `<strong>¡Duelo finalizado!</strong><br>`;
-    if (data.winner && data.loser) {
-      msg += `Ganador: <span style='color:#2a7;font-weight:bold;'>${data.winner.alias || data.winner.name || data.winner.id}</span><br>`;
-      msg += `Perdedor: <span style='color:#a22;'>${data.loser.alias || data.loser.name || data.loser.id}</span><br>`;
-    } else if (data.winner) {
-      msg += `Ganador: <span style='color:#2a7;font-weight:bold;'>${data.winner.alias || data.winner.name || data.winner.id}</span><br>`;
-    } else {
-      msg += `No se pudo determinar el ganador.`;
-    }
-    msg += `</div>`;
-    if (resultDiv) resultDiv.innerHTML = msg;
-    loadBattles();
-  } else {
-    const error = await res.json().catch(() => ({}));
-    alert('Error al crear duelo: ' + (error.error || res.statusText));
-  }
-}
+
 
 // Función para validar configuración de personajes
 function validateCharacterConfig() {

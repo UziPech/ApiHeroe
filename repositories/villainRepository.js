@@ -1,29 +1,30 @@
-import fs from 'fs-extra';
 import Villain from '../models/villainModel.js';
 
-const filePath = './villains.json';
-
 async function getVillains() {
-    try {
-        const data = await fs.readJson(filePath);
-        return data.map(villain => new Villain(
-            villain.id, villain.name, villain.alias, villain.city, villain.team
-        ));
-    } catch (error) {
-        console.error(error);
-        return [];
-    }
+    return await Villain.find();
 }
 
-async function saveVillains(villains) {
-    try {
-        await fs.writeJson(filePath, villains);
-    } catch (error) {
-        console.error(error);
-    }
+async function getVillainById(id) {
+    return await Villain.findOne({ id: parseInt(id) });
+}
+
+async function saveVillain(villainData) {
+    const villain = new Villain(villainData);
+    return await villain.save();
+}
+
+async function updateVillain(id, updatedVillain) {
+    return await Villain.findOneAndUpdate({ id: parseInt(id) }, updatedVillain, { new: true });
+}
+
+async function deleteVillain(id) {
+    return await Villain.findOneAndDelete({ id: parseInt(id) });
 }
 
 export default {
     getVillains,
-    saveVillains
+    getVillainById,
+    saveVillain,
+    updateVillain,
+    deleteVillain
 };

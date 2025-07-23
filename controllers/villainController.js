@@ -60,8 +60,20 @@ router.post("/villains",
         }
         try {
             const { name, alias, city, team } = req.body;
-            const newVillain = new Villain(null, name, alias, city, team);
-            const addedVillain = await villainService.addVillain(newVillain);
+            // Obtener el último ID para generar uno nuevo
+            const lastVillain = await Villain.findOne().sort({ id: -1 });
+            const newId = lastVillain ? lastVillain.id + 1 : 1;
+            
+            // Crear nuevo villano usando el modelo de Mongoose
+            const newVillain = new Villain({
+                id: newId,
+                name,
+                alias,
+                city: city || '',
+                team: team || '',
+                power: 50 // Valor por defecto para power
+            });
+            const addedVillain = await newVillain.save();
             res.status(201).json(addedVillain);
         } catch (error) {
             res.status(500).json({ error: error.message });

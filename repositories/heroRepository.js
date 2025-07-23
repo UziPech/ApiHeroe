@@ -1,29 +1,30 @@
-import fs from 'fs-extra';
 import Hero from '../models/heroModel.js';
 
-const filePath = './superheroes.json';
-
 async function getHeroes() {
-    try {
-        const data = await fs.readJson(filePath);
-        return data.map(hero => new Hero(
-            hero.id, hero.name, hero.alias, hero.city, hero.team
-        ));
-    } catch (error) {
-        console.error(error);
-        return [];
-    }
+    return await Hero.find();
 }
 
-async function saveHeroes(heroes) {
-    try {
-        await fs.writeJson(filePath, heroes);
-    } catch (error) {
-        console.error(error);
-    }
+async function getHeroById(id) {
+    return await Hero.findOne({ id: parseInt(id) });
+}
+
+async function saveHero(heroData) {
+    const hero = new Hero(heroData);
+    return await hero.save();
+}
+
+async function updateHero(id, updatedHero) {
+    return await Hero.findOneAndUpdate({ id: parseInt(id) }, updatedHero, { new: true });
+}
+
+async function deleteHero(id) {
+    return await Hero.findOneAndDelete({ id: parseInt(id) });
 }
 
 export default {
     getHeroes,
-    saveHeroes
+    getHeroById,
+    saveHero,
+    updateHero,
+    deleteHero
 };

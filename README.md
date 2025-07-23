@@ -33,6 +33,25 @@ npm start
 npm run dev
 ```
 
+## Instalación de dependencias necesarias para MongoDB y JWT
+
+```bash
+npm install mongoose dotenv jsonwebtoken
+```
+
+## Variables de entorno
+Crea un archivo `.env` en la raíz del proyecto con el siguiente contenido:
+
+```
+MONGODB_URI=mongodb+srv://uzielisaac28:J0nolN2H2vOHo4qQ@cluster0.pbysfka.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+JWT_SECRET=mi_super_secreto_jwt_2024
+```
+
+## Seguridad y autenticación
+- Todos los endpoints de batallas están protegidos con JWT.
+- El token debe enviarse en el header `Authorization` como: `Bearer <token>`.
+- Cada usuario solo puede ver y manipular sus propias batallas.
+
 ## 🌐 Endpoints
 
 ### Superhéroes
