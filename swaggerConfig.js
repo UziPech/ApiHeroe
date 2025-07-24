@@ -21,48 +21,26 @@ const options = {
         },
       },
       schemas: {
-        // Esquemas para CREACIÓN de personajes (solo campos que proporciona el usuario)
-        HeroCreate: {
-          type: 'object',
-          required: ['name', 'alias'],
-          properties: {
-            name: { type: 'string', example: 'Superman', description: 'Nombre del héroe' },
-            alias: { type: 'string', example: 'Clark Kent', description: 'Identidad secreta del héroe' },
-            city: { type: 'string', example: 'Metropolis', description: 'Ciudad del héroe (opcional)' },
-            team: { type: 'string', example: 'Justice League', description: 'Equipo del héroe (opcional)' }
-          }
-        },
-        VillainCreate: {
-          type: 'object',
-          required: ['name', 'alias'],
-          properties: {
-            name: { type: 'string', example: 'Joker', description: 'Nombre del villano' },
-            alias: { type: 'string', example: 'Joker', description: 'Identidad secreta del villano' },
-            city: { type: 'string', example: 'Gotham City', description: 'Ciudad del villano (opcional)' },
-            team: { type: 'string', example: 'Legion of Doom', description: 'Equipo del villano (opcional)' }
-          }
-        },
-        // Esquemas para RESPUESTA de personajes (con todos los campos de la base de datos)
         Hero: {
           type: 'object',
           properties: {
-            id: { type: 'number', example: 1, description: 'ID único asignado automáticamente por el sistema' },
+            id: { type: 'number', example: 1 },
             name: { type: 'string', example: 'Superman' },
             alias: { type: 'string', example: 'Clark Kent' },
-            power: { type: 'number', example: 85, description: 'Poder generado aleatoriamente (1-100)' },
-            city: { type: 'string', example: 'Metropolis', description: 'Ciudad del héroe' },
-            team: { type: 'string', example: 'Justice League', description: 'Equipo del héroe' }
+            power: { type: 'number', example: 100 },
+            level: { type: 'number', example: 1 },
+            defense: { type: 'number', example: 50 }
           }
         },
         Villain: {
           type: 'object',
           properties: {
-            id: { type: 'number', example: 101, description: 'ID único asignado automáticamente por el sistema' },
+            id: { type: 'number', example: 101 },
             name: { type: 'string', example: 'Joker' },
             alias: { type: 'string', example: 'Joker' },
-            power: { type: 'number', example: 78, description: 'Poder generado aleatoriamente (1-100)' },
-            city: { type: 'string', example: 'Gotham City', description: 'Ciudad del villano' },
-            team: { type: 'string', example: 'Legion of Doom', description: 'Equipo del villano' }
+            power: { type: 'number', example: 90 },
+            level: { type: 'number', example: 1 },
+            defense: { type: 'number', example: 40 }
           }
         },
         CharacterState: {

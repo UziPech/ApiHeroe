@@ -8,34 +8,9 @@ const router = express.Router();
 /**
  * @swagger
  * /heroes:
- *   post:
- *     summary: Crea un nuevo héroe
- *     tags: [Heroes]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/HeroCreate'
- *     responses:
- *       201:
- *         description: Héroe creado exitosamente
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Hero'
- *       400:
- *         description: Error de validación - nombre y alias son requeridos
- *       500:
- *         description: Error interno del servidor
- */
-
-/**
- * @swagger
- * /heroes:
  *   get:
  *     summary: Obtiene todos los héroes
- *     tags: [Heroes]
+ *     tags: [Héroes]
  *     responses:
  *       200:
  *         description: Lista de héroes
@@ -55,6 +30,24 @@ router.get("/heroes", async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /heroes:
+ *   post:
+ *     summary: Crea un nuevo héroe
+ *     tags: [Héroes]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Hero'
+ *     responses:
+ *       201:
+ *         description: Héroe creado
+ *       400:
+ *         description: Error de validación
+ */
 router.post("/heroes",
     [
         check('name').not().isEmpty().withMessage('El nombre es requerido'),
@@ -67,21 +60,18 @@ router.post("/heroes",
         }
         try {
             const { name, alias, city, team } = req.body;
-            // Obtener el último ID para generar uno nuevo (incremental automático)
+            // Obtener el último ID para generar uno nuevo
             const lastHero = await Hero.findOne().sort({ id: -1 });
             const newId = lastHero ? lastHero.id + 1 : 1;
-            
-            // Generar poder aleatorio entre 1 y 100
-            const randomPower = Math.floor(Math.random() * 100) + 1;
             
             // Crear nuevo héroe usando el modelo de Mongoose
             const newHero = new Hero({
                 id: newId,
                 name,
                 alias,
-                power: randomPower,
                 city: city || '',
-                team: team || ''
+                team: team || '',
+                power: 50 // Valor por defecto para power
             });
             const addedHero = await newHero.save();
             res.status(201).json(addedHero);
@@ -95,7 +85,7 @@ router.post("/heroes",
  * /heroes/{id}:
  *   put:
  *     summary: Actualiza un héroe existente
- *     tags: [Heroes]
+ *     tags: [Héroes]
  *     parameters:
  *       - in: path
  *         name: id
@@ -133,7 +123,7 @@ router.put("/heroes/:id", async (req, res) => {
  * /heroes/{id}:
  *   delete:
  *     summary: Elimina un héroe
- *     tags: [Heroes]
+ *     tags: [Héroes]
  *     parameters:
  *       - in: path
  *         name: id
@@ -165,7 +155,7 @@ router.delete('/heroes/:id', async (req, res) => {
  * /heroes/city/{city}:
  *   get:
  *     summary: Busca héroes por ciudad
- *     tags: [Heroes]
+ *     tags: [Héroes]
  *     parameters:
  *       - in: path
  *         name: city

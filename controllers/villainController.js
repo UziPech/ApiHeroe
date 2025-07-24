@@ -8,34 +8,9 @@ const router = express.Router();
 /**
  * @swagger
  * /villains:
- *   post:
- *     summary: Crea un nuevo villano
- *     tags: [Villains]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/VillainCreate'
- *     responses:
- *       201:
- *         description: Villano creado exitosamente
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Villain'
- *       400:
- *         description: Error de validación - nombre y alias son requeridos
- *       500:
- *         description: Error interno del servidor
- */
-
-/**
- * @swagger
- * /villains:
  *   get:
  *     summary: Obtiene todos los villanos
- *     tags: [Villains]
+ *     tags: [Villanos]
  *     responses:
  *       200:
  *         description: Lista de villanos
@@ -55,6 +30,24 @@ router.get("/villains", async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /villains:
+ *   post:
+ *     summary: Crea un nuevo villano
+ *     tags: [Villanos]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Villain'
+ *     responses:
+ *       201:
+ *         description: Villano creado
+ *       400:
+ *         description: Error de validación
+ */
 router.post("/villains",
     [
         check('name').not().isEmpty().withMessage('El nombre es requerido'),
@@ -67,21 +60,18 @@ router.post("/villains",
         }
         try {
             const { name, alias, city, team } = req.body;
-            // Obtener el último ID para generar uno nuevo (incremental automático)
+            // Obtener el último ID para generar uno nuevo
             const lastVillain = await Villain.findOne().sort({ id: -1 });
             const newId = lastVillain ? lastVillain.id + 1 : 1;
-            
-            // Generar poder aleatorio entre 1 y 100
-            const randomPower = Math.floor(Math.random() * 100) + 1;
             
             // Crear nuevo villano usando el modelo de Mongoose
             const newVillain = new Villain({
                 id: newId,
                 name,
                 alias,
-                power: randomPower,
                 city: city || '',
-                team: team || ''
+                team: team || '',
+                power: 50 // Valor por defecto para power
             });
             const addedVillain = await newVillain.save();
             res.status(201).json(addedVillain);
@@ -95,7 +85,7 @@ router.post("/villains",
  * /villains/{id}:
  *   put:
  *     summary: Actualiza un villano existente
- *     tags: [Villains]
+ *     tags: [Villanos]
  *     parameters:
  *       - in: path
  *         name: id
@@ -133,7 +123,7 @@ router.put("/villains/:id", async (req, res) => {
  * /villains/{id}:
  *   delete:
  *     summary: Elimina un villano
- *     tags: [Villains]
+ *     tags: [Villanos]
  *     parameters:
  *       - in: path
  *         name: id
@@ -165,7 +155,7 @@ router.delete('/villains/:id', async (req, res) => {
  * /villains/city/{city}:
  *   get:
  *     summary: Busca villanos por ciudad
- *     tags: [Villains]
+ *     tags: [Villanos]
  *     parameters:
  *       - in: path
  *         name: city

@@ -14,7 +14,9 @@ async function saveHero(heroData) {
 }
 
 async function updateHero(id, updatedHero) {
-    return await Hero.findOneAndUpdate({ id: parseInt(id) }, updatedHero, { new: true });
+    // No permitir modificar 'id' ni 'power' desde el body
+    const { id: _ignoreId, power: _ignorePower, ...allowedFields } = updatedHero;
+    return await Hero.findOneAndUpdate({ id: parseInt(id) }, allowedFields, { new: true });
 }
 
 async function deleteHero(id) {

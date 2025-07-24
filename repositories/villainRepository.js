@@ -14,7 +14,9 @@ async function saveVillain(villainData) {
 }
 
 async function updateVillain(id, updatedVillain) {
-    return await Villain.findOneAndUpdate({ id: parseInt(id) }, updatedVillain, { new: true });
+    // No permitir modificar 'id' ni 'power' desde el body
+    const { id: _ignoreId, power: _ignorePower, ...allowedFields } = updatedVillain;
+    return await Villain.findOneAndUpdate({ id: parseInt(id) }, allowedFields, { new: true });
 }
 
 async function deleteVillain(id) {
