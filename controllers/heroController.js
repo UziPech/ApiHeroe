@@ -61,6 +61,8 @@ router.get("/heroes", async (req, res) => {
  *         description: Héroe creado
  *       400:
  *         description: Error de validación
+ *     x-note:
+ *       description: "No se permite duplicar héroes con el mismo nombre o alias."
  */
 router.post("/heroes",
     [

@@ -56,9 +56,23 @@ router.get("/villains", async (req, res) => {
  *             alias: "Joker"
  *             city: "Gotham City"
  *             team: "Legion of Doom"
- *         description: Villano creado
+ *     responses:
+ *       201:
+ *         description: Villano creado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Villano creado correctamente"
+ *                 villain:
+ *                   $ref: '#/components/schemas/Villain'
  *       400:
  *         description: Error de validación
+ *     x-note:
+ *       description: "No se permite duplicar villanos con el mismo nombre o alias."
  */
 router.post("/villains",
     [
