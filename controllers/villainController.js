@@ -70,7 +70,15 @@ router.get("/villains", async (req, res) => {
  *                 villain:
  *                   $ref: '#/components/schemas/Villain'
  *       400:
- *         description: Error de validación
+ *         description: Error de validación o personaje duplicado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Ya existe un villano con ese nombre o alias."
  *     x-note:
  *       description: "No se permite duplicar villanos con el mismo nombre o alias."
  */

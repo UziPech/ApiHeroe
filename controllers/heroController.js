@@ -60,7 +60,15 @@ router.get("/heroes", async (req, res) => {
  *       201:
  *         description: Héroe creado
  *       400:
- *         description: Error de validación
+ *         description: Error de validación o personaje duplicado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Ya existe un héroe con ese nombre o alias."
  *     x-note:
  *       description: "No se permite duplicar héroes con el mismo nombre o alias."
  */

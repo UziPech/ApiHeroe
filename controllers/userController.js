@@ -49,7 +49,15 @@ const router = express.Router();
  *       200:
  *         description: Token JWT generado
  *       400:
- *         description: Credenciales inválidas
+ *         description: Campo vacío o credenciales inválidas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Email y contraseña son obligatorios."
  */
 // Registro de usuario
 router.post('/register', async (req, res) => {
