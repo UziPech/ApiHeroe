@@ -41,7 +41,21 @@ router.get("/villains", async (req, res) => {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Villain'
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               alias:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *               team:
+ *                 type: string
+ *             example:
+ *               name: "Joker"
+ *               alias: "Joker"
+ *               city: "Gotham City"
+ *               team: "Legion of Doom"
  *     responses:
  *       201:
  *         description: Villano creado

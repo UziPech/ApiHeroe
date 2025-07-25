@@ -41,7 +41,21 @@ router.get("/heroes", async (req, res) => {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Hero'
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               alias:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *               team:
+ *                 type: string
+ *             example:
+ *               name: "Superman"
+ *               alias: "Clark Kent"
+ *               city: "Metropolis"
+ *               team: "Justice League"
  *     responses:
  *       201:
  *         description: Héroe creado
