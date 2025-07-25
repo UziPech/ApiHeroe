@@ -181,14 +181,10 @@ router.delete('/villains/:id', async (req, res) => {
 router.get('/villains/city/:city', async (req, res) => {
     const city = req.params.city;
     // Validar si es un número
-    if (!isNaN(city)) {
-        return res.status(400).json({ error: 'Solo se acepta texto relacionado a ciudades.' });
-    }
-    // Validar si es texto válido (solo letras y espacios)
-    if (!/^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]+$/.test(city)) {
-        return res.status(400).json({ error: 'Escriba bien el nombre de la ciudad.' });
-    }
-    try {
+ *             name: "Joker"
+ *             alias: "Joker"
+ *             city: "Gotham City"
+ *             team: "Legion of Doom"
         const villains = await villainService.findVillainsByCity(city);
         if (villains.length === 0) {
             return res.status(404).json({ error: 'Esa ciudad no se ha agregado.' });
