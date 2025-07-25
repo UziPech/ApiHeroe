@@ -159,6 +159,20 @@ router.put("/villains/:id", async (req, res) => {
         return res.status(400).json({ error: 'El id debe ser un número positivo.' });
     }
     try {
+       const { name, alias } = req.body;
+       // Validar duplicados por nombre o alias en otros villanos
+       if (name || alias) {
+           const exists = await Villain.findOne({
+               $or: [
+                   name ? { name } : {},
+                   alias ? { alias } : {}
+               ],
+               id: { $ne: parseInt(id) }
+           });
+           if (exists) {
+               return res.status(400).json({ error: 'Ya existe un villano con ese nombre o alias.' });
+           }
+       }
         const updatedVillain = await villainService.updateVillain(id, req.body);
         res.json(updatedVillain);
     } catch (error) {
