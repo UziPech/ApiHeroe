@@ -51,13 +51,11 @@ router.get("/villains", async (req, res) => {
  *                 type: string
  *               team:
  *                 type: string
- *             example:
- *               name: "Joker"
- *               alias: "Joker"
- *               city: "Gotham City"
- *               team: "Legion of Doom"
- *     responses:
- *       201:
+ *           example:
+ *             name: "Joker"
+ *             alias: "Joker"
+ *             city: "Gotham City"
+ *             team: "Legion of Doom"
  *         description: Villano creado
  *       400:
  *         description: Error de validación
