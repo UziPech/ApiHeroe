@@ -18,7 +18,14 @@ dotenv.config();
 connectDB();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'https://apiheroe-6n80uf4yb-uziels-projects-fa4bbf7c.vercel.app',
+    'https://TU-FRONTEND.vercel.app' // Reemplaza por el dominio real de tu frontend si lo tienes
+  ],
+  credentials: true
+}));
 
 // Swagger configuration - SOLUCIÓN FINAL QUE FUNCIONA
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
@@ -167,7 +174,7 @@ app.get('/docs', (req, res) => {
 });
 
 app.use(express.json());
-app.use(express.static('public'));
+
 
 // Ruta de prueba
 app.get('/', (req, res) => {
