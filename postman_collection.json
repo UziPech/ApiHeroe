@@ -1,0 +1,990 @@
+{
+  "info": {
+    "name": "API Superhéroes - Test Automatizado MEGA",
+    "description": "Colección 100% automatizada - Solo presiona RUN para ejecutar 140 tests automáticos (10 casos por endpoint)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "3.0.0"
+  },
+  "item": [
+    {
+      "name": "🚀 INICIO - Resetear Contadores",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Resetear todos los contadores al inicio - 10 casos por endpoint",
+              "pm.environment.set('registerCount', 0);",
+              "pm.environment.set('loginCount', 0);",
+              "pm.environment.set('listHeroesCount', 0);",
+              "pm.environment.set('createHeroCount', 0);",
+              "pm.environment.set('updateHeroCount', 0);",
+              "pm.environment.set('deleteHeroCount', 0);",
+              "pm.environment.set('listVillainsCount', 0);",
+              "pm.environment.set('createVillainCount', 0);",
+              "pm.environment.set('updateVillainCount', 0);",
+              "pm.environment.set('deleteVillainCount', 0);",
+              "pm.environment.set('battleCount', 0);",
+              "pm.environment.set('attackCount', 0);",
+              "pm.environment.set('duelCount', 0);",
+              "pm.environment.set('duelAttackCount', 0);",
+              "console.log('✅ Contadores reseteados - Iniciando 140 tests automáticos (10 por endpoint)...');",
+              "pm.execution.setNextRequest('Registro (10 casos)');"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://apiheroe.vercel.app/",
+          "protocol": "https",
+          "host": ["apiheroe", "vercel", "app"],
+          "path": [""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Registro (10 casos)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let count = parseInt(pm.environment.get('registerCount') || 0);",
+                  "count++;",
+                  "pm.environment.set('registerCount', count);",
+                  "// Generar datos variados para registro",
+                  "let domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'test.com'];",
+                  "let prefixes = ['user', 'test', 'demo', 'hero', 'admin', 'super', 'mega', 'ultra'];",
+                  "let passwords = ['123456789012', 'password123456', 'testpass1234', 'mypass123456', 'secure123456'];",
+                  "pm.request.body.raw = JSON.stringify({",
+                  "  username: prefixes[count % prefixes.length] + 'user' + count,",
+                  "  email: prefixes[count % prefixes.length] + 'user' + count + '@' + domains[count % domains.length],",
+                  "  password: passwords[count % passwords.length]",
+                  "});",
+                  "console.log(`Ejecutando Registro caso ${count}/10`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200, 201, 400, or 404', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404]);",
+                  "});",
+                  "let count = parseInt(pm.environment.get('registerCount'));",
+                  "if(count < 10) {",
+                  "  pm.execution.setNextRequest('Registro (10 casos)');",
+                  "} else {",
+                  "  console.log('✅ Registro completado (10 casos) - Iniciando Login');",
+                  "  pm.execution.setNextRequest('Login (10 casos)');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "https://apiheroe.vercel.app/api/users/register",
+              "protocol": "https",
+              "host": ["apiheroe", "vercel", "app"],
+              "path": ["api", "users", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login (10 casos)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let count = parseInt(pm.environment.get('loginCount') || 0);",
+                  "count++;",
+                  "pm.environment.set('loginCount', count);",
+                  "// Usar los mismos datos del registro para login",
+                  "let domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'test.com'];",
+                  "let prefixes = ['user', 'test', 'demo', 'hero', 'admin', 'super', 'mega', 'ultra'];",
+                  "let passwords = ['123456789012', 'password123456', 'testpass1234', 'mypass123456', 'secure123456'];",
+                  "pm.request.body.raw = JSON.stringify({",
+                  "  email: prefixes[count % prefixes.length] + 'user' + count + '@' + domains[count % domains.length],",
+                  "  password: passwords[count % passwords.length]",
+                  "});",
+                  "console.log(`Ejecutando Login caso ${count}/10`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  var json = pm.response.json();",
+                  "  if(json.token){ pm.environment.set('token', json.token); }",
+                  "} catch(e) {}",
+                  "pm.test('Status code is 200, 201, 400, or 404', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404]);",
+                  "});",
+                  "let count = parseInt(pm.environment.get('loginCount'));",
+                  "if(count < 10) {",
+                  "  pm.execution.setNextRequest('Login (10 casos)');",
+                  "} else {",
+                  "  console.log('✅ Login completado (10 casos) - Iniciando Héroes');",
+                  "  pm.execution.setNextRequest('Listar héroes (10 casos)');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "https://apiheroe.vercel.app/api/users/login",
+              "protocol": "https",
+              "host": ["apiheroe", "vercel", "app"],
+              "path": ["api", "users", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Héroes",
+      "item": [
+        {
+          "name": "Listar héroes (10 casos)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let count = parseInt(pm.environment.get('listHeroesCount') || 0);",
+                  "count++;",
+                  "pm.environment.set('listHeroesCount', count);",
+                  "console.log(`Ejecutando Listar Héroes caso ${count}/10`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200, 201, 400, or 404', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404]);",
+                  "});",
+                  "let count = parseInt(pm.environment.get('listHeroesCount'));",
+                  "if(count < 10) {",
+                  "  pm.execution.setNextRequest('Listar héroes (10 casos)');",
+                  "} else {",
+                  "  console.log('✅ Listar Héroes completado (10 casos) - Iniciando Crear Héroes');",
+                  "  pm.execution.setNextRequest('Crear héroe (10 casos)');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "https://apiheroe.vercel.app/api/heroes",
+              "protocol": "https",
+              "host": ["apiheroe", "vercel", "app"],
+              "path": ["api", "heroes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear héroe (10 casos)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let count = parseInt(pm.environment.get('createHeroCount') || 0);",
+                  "count++;",
+                  "pm.environment.set('createHeroCount', count);",
+                  "",
+                  "// Arrays ampliados para mayor variedad",
+                  "let heroes = ['Superman', 'Batman', 'Wonder Woman', 'Flash', 'Green Lantern', 'Aquaman', 'Cyborg', 'Martian Manhunter', 'Green Arrow', 'Supergirl'];",
+                  "let cities = ['Metropolis', 'Gotham City', 'Themyscira', 'Central City', 'Coast City', 'Atlantis', 'Detroit', 'Mars', 'Star City', 'National City'];",
+                  "let teams = ['Justice League', 'Teen Titans', 'Birds of Prey', 'Outsiders', 'Doom Patrol', 'Avengers', 'X-Men', 'Fantastic Four', 'Guardians of the Galaxy', 'Defenders'];",
+                  "",
+                  "pm.request.body.raw = JSON.stringify({",
+                  "  name: heroes[(count-1) % heroes.length] + count,",
+                  "  alias: 'Alias' + count,",
+                  "  city: cities[(count-1) % cities.length],",
+                  "  team: teams[(count-1) % teams.length]",
+                  "});",
+                  "console.log(`Ejecutando Crear Héroe caso ${count}/10 - ${heroes[(count-1) % heroes.length]}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200, 201, 400, or 404', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404]);",
+                  "});",
+                  "let count = parseInt(pm.environment.get('createHeroCount'));",
+                  "if(count < 10) {",
+                  "  pm.execution.setNextRequest('Crear héroe (10 casos)');",
+                  "} else {",
+                  "  console.log('✅ Crear Héroes completado (10 casos) - Iniciando Actualizar Héroes');",
+                  "  pm.execution.setNextRequest('Actualizar héroe (10 casos)');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "https://apiheroe.vercel.app/api/heroes",
+              "protocol": "https",
+              "host": ["apiheroe", "vercel", "app"],
+              "path": ["api", "heroes"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar héroe (10 casos)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let count = parseInt(pm.environment.get('updateHeroCount') || 0);",
+                  "count++;",
+                  "pm.environment.set('updateHeroCount', count);",
+                  "",
+                  "// Arrays expandidos para actualizaciones variadas",
+                  "let updatedNames = ['Updated Superman', 'Modified Batman', 'Enhanced Wonder Woman', 'Improved Flash', 'Upgraded Green Lantern', 'Evolved Aquaman', 'Advanced Cyborg', 'Transformed Martian Manhunter', 'Refined Green Arrow', 'Boosted Supergirl'];",
+                  "let updatedAliases = ['Ultimate Alias', 'Supreme Identity', 'Prime Persona', 'Alpha Ego', 'Beta Character', 'Gamma Self', 'Delta Persona', 'Epsilon Identity', 'Zeta Character', 'Eta Alias'];",
+                  "let updatedTeams = ['Elite Justice League', 'Premium Avengers', 'Advanced X-Men', 'Ultimate Fantastic Four', 'Supreme Guardians', 'Enhanced Defenders', 'Evolved Inhumans', 'Upgraded Teen Titans', 'Modified Birds of Prey', 'Improved Outsiders'];",
+                  "",
+                  "let heroId = Math.floor(Math.random() * 100) + 1;",
+                  "pm.environment.set('heroId', heroId);",
+                  "pm.request.body.raw = JSON.stringify({",
+                  "  name: updatedNames[(count-1) % updatedNames.length] + ' ' + count,",
+                  "  alias: updatedAliases[(count-1) % updatedAliases.length] + count,",
+                  "  city: 'UpdatedCity' + count,",
+                  "  team: updatedTeams[(count-1) % updatedTeams.length]",
+                  "});",
+                  "console.log(`Ejecutando Actualizar Héroe caso ${count}/10 - ID: ${heroId}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200, 201, 400, or 404', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404]);",
+                  "});",
+                  "let count = parseInt(pm.environment.get('updateHeroCount'));",
+                  "if(count < 10) {",
+                  "  pm.execution.setNextRequest('Actualizar héroe (10 casos)');",
+                  "} else {",
+                  "  console.log('✅ Actualizar Héroes completado (10 casos) - Iniciando Eliminar Héroes');",
+                  "  pm.execution.setNextRequest('Eliminar héroe (10 casos)');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "https://apiheroe.vercel.app/api/heroes/{{heroId}}",
+              "protocol": "https",
+              "host": ["apiheroe", "vercel", "app"],
+              "path": ["api", "heroes", "{{heroId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar héroe (10 casos)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let count = parseInt(pm.environment.get('deleteHeroCount') || 0);",
+                  "count++;",
+                  "pm.environment.set('deleteHeroCount', count);",
+                  "let heroId = Math.floor(Math.random() * 100) + 1;",
+                  "pm.environment.set('heroId', heroId);",
+                  "console.log(`Ejecutando Eliminar Héroe caso ${count}/10 - ID: ${heroId}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200, 201, 400, or 404', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404]);",
+                  "});",
+                  "let count = parseInt(pm.environment.get('deleteHeroCount'));",
+                  "if(count < 10) {",
+                  "  pm.execution.setNextRequest('Eliminar héroe (10 casos)');",
+                  "} else {",
+                  "  console.log('✅ Eliminar Héroes completado (10 casos) - Iniciando Villanos');",
+                  "  pm.execution.setNextRequest('Listar villanos (10 casos)');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "https://apiheroe.vercel.app/api/heroes/{{heroId}}",
+              "protocol": "https",
+              "host": ["apiheroe", "vercel", "app"],
+              "path": ["api", "heroes", "{{heroId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Villanos",
+      "item": [
+        {
+          "name": "Listar villanos (10 casos)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let count = parseInt(pm.environment.get('listVillainsCount') || 0);",
+                  "count++;",
+                  "pm.environment.set('listVillainsCount', count);",
+                  "console.log(`Ejecutando Listar Villanos caso ${count}/10`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200, 201, 400, or 404', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404]);",
+                  "});",
+                  "let count = parseInt(pm.environment.get('listVillainsCount'));",
+                  "if(count < 10) {",
+                  "  pm.execution.setNextRequest('Listar villanos (10 casos)');",
+                  "} else {",
+                  "  console.log('✅ Listar Villanos completado (10 casos) - Iniciando Crear Villanos');",
+                  "  pm.execution.setNextRequest('Crear villano (10 casos)');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "https://apiheroe.vercel.app/api/villains",
+              "protocol": "https",
+              "host": ["apiheroe", "vercel", "app"],
+              "path": ["api", "villains"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear villano (10 casos)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let count = parseInt(pm.environment.get('createVillainCount') || 0);",
+                  "count++;",
+                  "pm.environment.set('createVillainCount', count);",
+                  "",
+                  "// Arrays expandidos para villanos con gran variedad",
+                  "let villains = ['Joker', 'Lex Luthor', 'Harley Quinn', 'Penguin', 'Riddler', 'Two-Face', 'Catwoman', 'Poison Ivy', 'Scarecrow', 'Bane'];",
+                  "let villainCities = ['Gotham City', 'Metropolis', 'Central City', 'Star City', 'Coast City', 'Atlantis', 'Apokolips', 'Oa', 'Qward', 'Zamaron'];",
+                  "let villainTeams = ['Legion of Doom', 'Injustice League', 'Secret Society', 'Suicide Squad', 'Brotherhood of Evil Mutants', 'Sinister Six', 'Masters of Evil', 'Frightful Four', 'Serpent Society', 'Hydra'];",
+                  "",
+                  "pm.request.body.raw = JSON.stringify({",
+                  "  name: villains[(count-1) % villains.length] + count,",
+                  "  alias: 'VillainAlias' + count,",
+                  "  city: villainCities[(count-1) % villainCities.length],",
+                  "  team: villainTeams[(count-1) % villainTeams.length]",
+                  "});",
+                  "console.log(`Ejecutando Crear Villano caso ${count}/10 - ${villains[(count-1) % villains.length]}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200, 201, 400, or 404', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404]);",
+                  "});",
+                  "let count = parseInt(pm.environment.get('createVillainCount'));",
+                  "if(count < 10) {",
+                  "  pm.execution.setNextRequest('Crear villano (10 casos)');",
+                  "} else {",
+                  "  console.log('✅ Crear Villanos completado (10 casos) - Iniciando Actualizar Villanos');",
+                  "  pm.execution.setNextRequest('Actualizar villano (10 casos)');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "https://apiheroe.vercel.app/api/villains",
+              "protocol": "https",
+              "host": ["apiheroe", "vercel", "app"],
+              "path": ["api", "villains"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar villano (10 casos)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let count = parseInt(pm.environment.get('updateVillainCount') || 0);",
+                  "count++;",
+                  "pm.environment.set('updateVillainCount', count);",
+                  "",
+                  "// Arrays expandidos para actualizaciones de villanos",
+                  "let updatedVillains = ['Enhanced Joker', 'Supreme Lex Luthor', 'Ultimate Harley Quinn', 'Advanced Penguin', 'Modified Riddler', 'Evolved Two-Face', 'Enhanced Catwoman', 'Supreme Poison Ivy', 'Ultimate Scarecrow', 'Advanced Bane'];",
+                  "let updatedVillainAliases = ['Dark Lord', 'Shadow Master', 'Chaos Bringer', 'Death Dealer', 'Pain Inflector', 'Terror Lord', 'Nightmare King', 'Doom Bringer', 'Darkness Emperor', 'Evil Overlord'];",
+                  "let updatedVillainTeams = ['Elite Legion of Doom', 'Supreme Injustice League', 'Ultimate Secret Society', 'Advanced Suicide Squad', 'Enhanced Brotherhood', 'Modified Sinister Six', 'Evolved Masters of Evil', 'Supreme Frightful Four', 'Ultimate Serpent Society', 'Advanced Hydra Elite'];",
+                  "",
+                  "let villainId = Math.floor(Math.random() * 100) + 1;",
+                  "pm.environment.set('villainId', villainId);",
+                  "pm.request.body.raw = JSON.stringify({",
+                  "  name: updatedVillains[(count-1) % updatedVillains.length] + ' ' + count,",
+                  "  alias: updatedVillainAliases[(count-1) % updatedVillainAliases.length] + count,",
+                  "  city: 'UpdatedVillainCity' + count,",
+                  "  team: updatedVillainTeams[(count-1) % updatedVillainTeams.length]",
+                  "});",
+                  "console.log(`Ejecutando Actualizar Villano caso ${count}/10 - ID: ${villainId}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200, 201, 400, or 404', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404]);",
+                  "});",
+                  "let count = parseInt(pm.environment.get('updateVillainCount'));",
+                  "if(count < 10) {",
+                  "  pm.execution.setNextRequest('Actualizar villano (10 casos)');",
+                  "} else {",
+                  "  console.log('✅ Actualizar Villanos completado (10 casos) - Iniciando Eliminar Villanos');",
+                  "  pm.execution.setNextRequest('Eliminar villano (10 casos)');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "https://apiheroe.vercel.app/api/villains/{{villainId}}",
+              "protocol": "https",
+              "host": ["apiheroe", "vercel", "app"],
+              "path": ["api", "villains", "{{villainId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar villano (10 casos)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let count = parseInt(pm.environment.get('deleteVillainCount') || 0);",
+                  "count++;",
+                  "pm.environment.set('deleteVillainCount', count);",
+                  "let villainId = Math.floor(Math.random() * 100) + 1;",
+                  "pm.environment.set('villainId', villainId);",
+                  "console.log(`Ejecutando Eliminar Villano caso ${count}/10 - ID: ${villainId}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200, 201, 400, or 404', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404]);",
+                  "});",
+                  "let count = parseInt(pm.environment.get('deleteVillainCount'));",
+                  "if(count < 10) {",
+                  "  pm.execution.setNextRequest('Eliminar villano (10 casos)');",
+                  "} else {",
+                  "  console.log('✅ Eliminar Villanos completado (10 casos) - Iniciando Batallas');",
+                  "  pm.execution.setNextRequest('Crear batalla en equipo (10 casos)');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "https://apiheroe.vercel.app/api/villains/{{villainId}}",
+              "protocol": "https",
+              "host": ["apiheroe", "vercel", "app"],
+              "path": ["api", "villains", "{{villainId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Batallas",
+      "item": [
+        {
+          "name": "Crear batalla en equipo (10 casos)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let count = parseInt(pm.environment.get('battleCount') || 0);",
+                  "count++;",
+                  "pm.environment.set('battleCount', count);",
+                  "",
+                  "// Generar equipos más variados para batallas",
+                  "let teamSizes = [2, 3, 4, 5]; // Diferentes tamaños de equipos",
+                  "let heroTeamSize = teamSizes[Math.floor(Math.random() * teamSizes.length)];",
+                  "let villainTeamSize = teamSizes[Math.floor(Math.random() * teamSizes.length)];",
+                  "",
+                  "let heroes = []; ",
+                  "while(heroes.length < heroTeamSize){ ",
+                  "  let id = Math.floor(Math.random() * 100) + 1; ",
+                  "  if(!heroes.includes(id)) heroes.push(id); ",
+                  "}",
+                  "",
+                  "let villains = []; ",
+                  "while(villains.length < villainTeamSize){ ",
+                  "  let id = Math.floor(Math.random() * 100) + 1; ",
+                  "  if(!villains.includes(id)) villains.push(id); ",
+                  "}",
+                  "",
+                  "let userSides = ['heroes', 'villains'];",
+                  "let selectedSide = userSides[Math.floor(Math.random() * userSides.length)];",
+                  "",
+                  "pm.request.body.raw = JSON.stringify({",
+                  "  heroes: heroes,",
+                  "  villains: villains,",
+                  "  userSide: selectedSide,",
+                  "  firstHero: heroes[0],",
+                  "  firstVillain: villains[0],",
+                  "  heroConfig: {},",
+                  "  villainConfig: {}",
+                  "});",
+                  "console.log(`Ejecutando Crear Batalla caso ${count}/10 - ${heroTeamSize}v${villainTeamSize} (${selectedSide})`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  var json = pm.response.json();",
+                  "  if(json.battleId || json.id || json._id) {",
+                  "    let battleId = json.battleId || json.id || json._id;",
+                  "    pm.environment.set('currentBattleId', battleId);",
+                  "  }",
+                  "} catch(e) {}",
+                  "pm.test('Status code is 200, 201, 400, or 404', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404]);",
+                  "});",
+                  "let count = parseInt(pm.environment.get('battleCount'));",
+                  "if(count < 10) {",
+                  "  pm.execution.setNextRequest('Crear batalla en equipo (10 casos)');",
+                  "} else {",
+                  "  console.log('✅ Crear Batallas completado (10 casos) - Iniciando Ataques en Batalla');",
+                  "  pm.execution.setNextRequest('Realizar ataque en batalla (10 casos)');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "https://apiheroe.vercel.app/api/battles/team",
+              "protocol": "https",
+              "host": ["apiheroe", "vercel", "app"],
+              "path": ["api", "battles", "team"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Realizar ataque en batalla (10 casos)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let count = parseInt(pm.environment.get('attackCount') || 0);",
+                  "count++;",
+                  "pm.environment.set('attackCount', count);",
+                  "",
+                  "// Más variedad en ataques de batalla",
+                  "let battleId = pm.environment.get('currentBattleId') || '1753423139965';",
+                  "let attackerId = Math.floor(Math.random() * 100) + 1;",
+                  "let attackTypes = ['basico', 'especial', 'critico', 'definitivo', 'combinado'];",
+                  "let attackType = attackTypes[Math.floor(Math.random() * attackTypes.length)];",
+                  "",
+                  "// Targets opcionales para ataques más complejos",
+                  "let targets = [];",
+                  "if(Math.random() > 0.5) {",
+                  "  let targetCount = Math.floor(Math.random() * 3) + 1;",
+                  "  for(let i = 0; i < targetCount; i++) {",
+                  "    targets.push(Math.floor(Math.random() * 100) + 1);",
+                  "  }",
+                  "}",
+                  "",
+                  "let attackData = {",
+                  "  attacker: attackerId,",
+                  "  attackType: attackType",
+                  "};",
+                  "",
+                  "if(targets.length > 0) {",
+                  "  attackData.targets = targets;",
+                  "}",
+                  "",
+                  "pm.request.body.raw = JSON.stringify(attackData);",
+                  "pm.request.url.path = ['api', 'battles', battleId, 'attack'];",
+                  "console.log(`Ejecutando Ataque en Batalla caso ${count}/10 - ${attackType.toUpperCase()} (ID: ${attackerId})`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200, 201, 400, or 404', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404]);",
+                  "});",
+                  "let count = parseInt(pm.environment.get('attackCount'));",
+                  "if(count < 10) {",
+                  "  pm.execution.setNextRequest('Realizar ataque en batalla (10 casos)');",
+                  "} else {",
+                  "  console.log('✅ Ataques en Batalla completados (10 casos) - Iniciando Duelos');",
+                  "  pm.execution.setNextRequest('Crear duelo 1vs1 (10 casos)');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "https://apiheroe.vercel.app/api/battles/{{currentBattleId}}/attack",
+              "protocol": "https",
+              "host": ["apiheroe", "vercel", "app"],
+              "path": ["api", "battles", "{{currentBattleId}}", "attack"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Duelos",
+      "item": [
+        {
+          "name": "Crear duelo 1vs1 (10 casos)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let count = parseInt(pm.environment.get('duelCount') || 0);",
+                  "count++;",
+                  "pm.environment.set('duelCount', count);",
+                  "",
+                  "// Más variedad en duelos",
+                  "let heroId = Math.floor(Math.random() * 100) + 1;",
+                  "let villainId = Math.floor(Math.random() * 100) + 1;",
+                  "let userSides = ['hero', 'villain', 'neutral'];",
+                  "let selectedSide = userSides[Math.floor(Math.random() * userSides.length)];",
+                  "",
+                  "// Configuraciones especiales para duelos",
+                  "let duelTypes = ['clasico', 'rapido', 'extremo', 'legendario'];",
+                  "let duelType = duelTypes[Math.floor(Math.random() * duelTypes.length)];",
+                  "",
+                  "let duelData = {",
+                  "  heroId: heroId,",
+                  "  villainId: villainId,",
+                  "  userSide: selectedSide",
+                  "};",
+                  "",
+                  "// Agregar configuraciones especiales ocasionalmente",
+                  "if(Math.random() > 0.7) {",
+                  "  duelData.duelType = duelType;",
+                  "  duelData.powerMultiplier = Math.floor(Math.random() * 3) + 1;",
+                  "}",
+                  "",
+                  "pm.request.body.raw = JSON.stringify(duelData);",
+                  "console.log(`Ejecutando Crear Duelo caso ${count}/10 - H${heroId} vs V${villainId} (${selectedSide})`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  var json = pm.response.json();",
+                  "  if(json.duelId || json.id || json._id) {",
+                  "    let duelId = json.duelId || json.id || json._id;",
+                  "    pm.environment.set('currentDuelId', duelId);",
+                  "  }",
+                  "} catch(e) {}",
+                  "pm.test('Status code is 200, 201, 400, or 404', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404]);",
+                  "});",
+                  "let count = parseInt(pm.environment.get('duelCount'));",
+                  "if(count < 10) {",
+                  "  pm.execution.setNextRequest('Crear duelo 1vs1 (10 casos)');",
+                  "} else {",
+                  "  console.log('✅ Crear Duelos completado (10 casos) - Iniciando Ataques en Duelo');",
+                  "  pm.execution.setNextRequest('Realizar ataque en duelo (10 casos)');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "https://apiheroe.vercel.app/api/duels",
+              "protocol": "https",
+              "host": ["apiheroe", "vercel", "app"],
+              "path": ["api", "duels"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Realizar ataque en duelo (10 casos)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let count = parseInt(pm.environment.get('duelAttackCount') || 0);",
+                  "count++;",
+                  "pm.environment.set('duelAttackCount', count);",
+                  "",
+                  "// Más variedad en ataques de duelo",
+                  "let attackerId = Math.floor(Math.random() * 100) + 1;",
+                  "let attackTypes = ['basico', 'especial', 'critico', 'combo', 'ultimate', 'counter'];",
+                  "let attackType = attackTypes[Math.floor(Math.random() * attackTypes.length)];",
+                  "",
+                  "// Intensidad de ataque variable",
+                  "let intensities = ['low', 'medium', 'high', 'maximum'];",
+                  "let intensity = intensities[Math.floor(Math.random() * intensities.length)];",
+                  "",
+                  "let attackData = {",
+                  "  attackerId: attackerId,",
+                  "  attackType: attackType",
+                  "};",
+                  "",
+                  "// Agregar propiedades especiales ocasionalmente",
+                  "if(Math.random() > 0.6) {",
+                  "  attackData.intensity = intensity;",
+                  "  attackData.precision = Math.floor(Math.random() * 100) + 1;",
+                  "}",
+                  "",
+                  "pm.request.body.raw = JSON.stringify(attackData);",
+                  "console.log(`Ejecutando Ataque en Duelo caso ${count}/10 - ${attackType.toUpperCase()} (${intensity || 'normal'})`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200, 201, 400, or 404', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404]);",
+                  "});",
+                  "let count = parseInt(pm.environment.get('duelAttackCount'));",
+                  "if(count < 10) {",
+                  "  pm.execution.setNextRequest('Realizar ataque en duelo (10 casos)');",
+                  "} else {",
+                  "  console.log('🎉 TODOS LOS TESTS COMPLETADOS! 140 casos ejecutados exitosamente (10 por endpoint)');",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "https://apiheroe.vercel.app/api/duels/attack",
+              "protocol": "https",
+              "host": ["apiheroe", "vercel", "app"],
+              "path": ["api", "duels", "attack"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

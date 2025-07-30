@@ -1,0 +1,57 @@
+.battle-bg {
+  min-height: 100vh;
+  background: linear-gradient(120deg, #6bbf59 60%, #b6e2a1 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.battle-field {
+  display: flex;
+  justify-content: space-between;
+  width: 700px;
+  margin-bottom: 2rem;
+}
+.battle-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.circle-zone {
+  width: 140px;
+  height: 60px;
+  background: radial-gradient(ellipse at center, #b6e2a1 60%, #3e5c2c 100%);
+  border-radius: 50% 50% 60% 60%/60% 60% 100% 100%;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 24px #0004;
+}
+.stats {
+  background: #e6f2d6;
+  border-radius: 12px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #2e3d1f;
+  font-size: 1rem;
+}
+.battle-menu {
+  display: flex;
+  gap: 1.5rem;
+  background: #4e7d3a;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px #0004;
+}
+.battle-menu button {
+  background: #b6e2a1;
+  color: #2e3d1f;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.battle-menu button:hover {
+  background: #7bb661;
+}

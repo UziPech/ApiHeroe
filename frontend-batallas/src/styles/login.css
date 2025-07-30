@@ -1,0 +1,50 @@
+.login-bosque-bg {
+  min-height: 100vh;
+  background: linear-gradient(120deg, #3e5c2c 60%, #7bb661 100%);
+  background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80');
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login-container {
+  background: rgba(34, 49, 34, 0.85);
+  border-radius: 16px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 4px 24px #0008;
+  color: #fff;
+  text-align: center;
+}
+.login-form input {
+  display: block;
+  width: 100%;
+  margin: 1rem 0;
+  padding: 0.7rem;
+  border-radius: 8px;
+  border: none;
+  background: #e6e6e6;
+  color: #222;
+  font-size: 1rem;
+}
+.login-form button {
+  background: #7bb661;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 2rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background 0.2s;
+}
+.login-form button:hover {
+  background: #3e5c2c;
+}
+.login-register {
+  margin-top: 1rem;
+  color: #b2e59e;
+}
+.login-register a {
+  color: #fff;
+  text-decoration: underline;
+}
