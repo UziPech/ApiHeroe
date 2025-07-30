@@ -1,3 +1,4 @@
+
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -18,9 +19,12 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+// CORS debe ir antes de cualquier ruta
 app.use(cors({
   origin: [
     'http://localhost:5173',
+    'https://apiheroe.vercel.app',
     'https://apiheroe-6n80uf4yb-uziels-projects-fa4bbf7c.vercel.app',
     'https://TU-FRONTEND.vercel.app' // Reemplaza por el dominio real de tu frontend si lo tienes
   ],
