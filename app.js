@@ -22,12 +22,24 @@ const app = express();
 
 // CORS debe ir antes de cualquier ruta
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'https://apiheroe.vercel.app',
-    'https://apiheroe-6n80uf4yb-uziels-projects-fa4bbf7c.vercel.app',
-    'https://TU-FRONTEND.vercel.app' // Reemplaza por el dominio real de tu frontend si lo tienes
-  ],
+  origin: function (origin, callback) {
+    // Permitir localhost y todos los subdominios de vercel.app
+    const allowed = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'https://apiheroe.vercel.app',
+      'https://TU-FRONTEND.vercel.app' // Reemplaza por el dominio real de tu frontend si lo tienes
+    ];
+    if (
+      !origin ||
+      allowed.includes(origin) ||
+      /^https:\/\/[a-z0-9\-]+\.vercel\.app$/.test(origin)
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS: ' + origin));
+    }
+  },
   credentials: true
 }));
 
