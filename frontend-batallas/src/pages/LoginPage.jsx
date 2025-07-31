@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { buildApiUrl, getPublicHeaders } from '../config/api';
 import '../styles/login.css';
 
 export default function LoginPage({ onLogin }) {
@@ -19,9 +20,9 @@ export default function LoginPage({ onLogin }) {
     try {
       if (isRegister) {
         // Registro
-        const res = await fetch('https://apiheroe.vercel.app/api/users/register', {
+        const res = await fetch(buildApiUrl('/api/users/register'), {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getPublicHeaders(),
           body: JSON.stringify({ username, email, password })
         });
         const text = await res.text();
@@ -37,9 +38,9 @@ export default function LoginPage({ onLogin }) {
         setIsRegister(false);
       } else {
         // Login
-        const res = await fetch('https://apiheroe.vercel.app/api/users/login', {
+        const res = await fetch(buildApiUrl('/api/users/login'), {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getPublicHeaders(),
           body: JSON.stringify({ email, password })
         });
         const text = await res.text();

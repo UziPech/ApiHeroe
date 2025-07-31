@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import { buildApiUrl, getAuthHeaders, getPublicHeaders } from '../config/api';
 import '../styles/select.css';
 
 export default function SelectCharacterPage({ onSelect }) {
@@ -19,16 +20,12 @@ export default function SelectCharacterPage({ onSelect }) {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-                 const hRes = await fetch('https://apiheroe-r9hz01hto-uziels-projects-fa4bbf7c.vercel.app/api/heroes', {
-           headers: {
-             'Content-Type': 'application/json'
-           }
-         });
-         const vRes = await fetch('https://apiheroe-r9hz01hto-uziels-projects-fa4bbf7c.vercel.app/api/villains', {
-           headers: {
-             'Content-Type': 'application/json'
-           }
-         });
+                         const hRes = await fetch(buildApiUrl('/api/heroes'), {
+          headers: getPublicHeaders()
+        });
+        const vRes = await fetch(buildApiUrl('/api/villains'), {
+          headers: getPublicHeaders()
+        });
         const heroesData = await hRes.json();
         const villainsData = await vRes.json();
         setHeroes(Array.isArray(heroesData) ? heroesData.slice(0, 10) : []);
@@ -107,12 +104,9 @@ export default function SelectCharacterPage({ onSelect }) {
         villainConfig
       }); // Debug
 
-             const res = await fetch('https://apiheroe-r9hz01hto-uziels-projects-fa4bbf7c.vercel.app/api/battles/team', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // Agregamos 'Bearer' al token
-        },
+                     const res = await fetch(buildApiUrl('/api/battles/team'), {
+          method: 'POST',
+          headers: getAuthHeaders(token),
         body: JSON.stringify({
           heroes: selectedHeroes,
           villains: selectedVillains,

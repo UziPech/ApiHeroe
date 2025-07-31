@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
+import { buildApiUrl, getAuthHeaders } from '../config/api';
 import '../styles/battle.css';
 
 const ATTACKS = [
@@ -24,10 +25,8 @@ export default function BattlePage() {
         setLoading(false);
         return;
       }
-             const res = await fetch(`https://apiheroe-r9hz01hto-uziels-projects-fa4bbf7c.vercel.app/api/battles/${battleId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+             const res = await fetch(buildApiUrl(`/api/battles/${battleId}`), {
+        headers: getAuthHeaders(token)
       });
       if (!res.ok) throw new Error('No se pudo cargar la batalla');
       const data = await res.json();
@@ -144,12 +143,9 @@ export default function BattlePage() {
     try {
       const token = localStorage.getItem('token');
       
-             const res = await fetch(`https://apiheroe-r9hz01hto-uziels-projects-fa4bbf7c.vercel.app/api/battles/${battle.id}/attack`, {
+             const res = await fetch(buildApiUrl(`/api/battles/${battle.id}/attack`), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: getAuthHeaders(token),
         body: JSON.stringify({
           attacker: attackerId,
           attackType
