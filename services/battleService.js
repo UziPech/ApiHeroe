@@ -209,19 +209,7 @@ async function performAttack(battleId, attackerId, attackType) {
   const newHp = Math.max(0, defender.hp - damage);
   defender.hp = newHp;
   
-  // Debug del cálculo de daño
-  console.log('Cálculo de daño:', {
-    attacker: attacker.alias,
-    defender: defender.alias,
-    attackType,
-    attackerPower: attacker.power,
-    defenderDefense: defender.defense,
-    baseDamage,
-    damageMultiplier,
-    finalDamage: damage,
-    hpBefore: hpBeforeAttack,
-    hpAfter: newHp
-  });
+
 
   // Registrar acción con más detalles
   if (!battle.actions) battle.actions = [];

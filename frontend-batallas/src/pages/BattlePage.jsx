@@ -85,11 +85,7 @@ export default function BattlePage() {
     activeVillain = teams?.villains?.find(v => v.id === current?.villain) || teams?.villains?.find(v => v.hp > 0) || teams?.villains?.[0];
   }
   
-  // Debug adicional para entender la desincronización
-  console.log('current.hero:', current?.hero);
-  console.log('current.villain:', current?.villain);
-  console.log('activeHero.id:', activeHero?.id);
-  console.log('activeVillain.id:', activeVillain?.id);
+
 
   // Defensa mínima visual
   const heroDefense = Math.max(activeHero?.defense ?? 0, 30);
@@ -108,7 +104,6 @@ export default function BattlePage() {
 
   // Realizar ataque
   const handleAttack = async (attackType) => {
-    console.log('🔄 INICIANDO ATAQUE:', attackType);
     setActionLoading(true);
     setError('');
 
@@ -129,20 +124,7 @@ export default function BattlePage() {
       // El backend usa 'hero' y 'villain' en lugar de 'heroId' y 'villainId'
       attackerId = userTeam === 'heroes' ? current?.hero : current?.villain;
 
-      // Debug
-      console.log('📊 Estado ANTES del ataque:', {
-        battleId: battle.id,
-        attacker: attackerId,
-        attackType,
-        current,
-        currentTeam,
-        userTeam,
-        heroHP: activeHero?.hp,
-        villainHP: activeVillain?.hp
-      });
 
-      console.log('🌐 Enviando petición a:', `https://apiheroe.vercel.app/api/battles/${battle.id}/attack`);
-      console.log('📤 Datos enviados:', { attacker: attackerId, attackType });
       
       const res = await fetch(`https://apiheroe.vercel.app/api/battles/${battle.id}/attack`, {
         method: 'POST',
@@ -155,24 +137,16 @@ export default function BattlePage() {
           attackType
         })
       });
-      console.log('📥 Respuesta recibida, status:', res.status);
       const data = await res.json();
-      console.log('📥 Datos de respuesta:', data);
-      
       if (!res.ok) throw new Error(data.error || 'Error al atacar');
-      
-      console.log('✅ Respuesta del backend después del ataque:', data);
-      console.log('✅ Estado de batalla actualizado:', data.battle);
       
       setBattle(data.battle); // Solo actualizamos el estado en memoria
     } catch (e) {
-      console.log('❌ ERROR en ataque:', e);
       setError(
         (e.message || 'Error desconocido') +
         ` | Atacante enviado: ${attackerId ?? '--'}`
       );
     } finally {
-      console.log('🏁 Finalizando ataque, actionLoading:', false);
       setActionLoading(false);
     }
   };
@@ -270,31 +244,13 @@ export default function BattlePage() {
             // Verificar si es nuestro turno
             const isOurTurn = current?.side === (battle.userSide || 'heroes');
             
-            // Debug de la condición de personaje correcto
-            const heroCondition = battle.userSide === 'heroes' && current?.hero && activeHero?.id === current?.hero;
-            const villainCondition = battle.userSide === 'villains' && current?.villain && activeVillain?.id === current?.villain;
-            const isCorrectCharacter = heroCondition || villainCondition;
-            
-            console.log('Debug botones:', {
-              isOurTurn,
-              heroCondition,
-              villainCondition,
-              isCorrectCharacter,
-              userSide: battle.userSide,
-              currentSide: current?.side,
-              currentHero: current?.hero,
-              currentVillain: current?.villain,
-              activeHeroId: activeHero?.id,
-              activeVillainId: activeVillain?.id
-            });
+            const isCorrectCharacter = (battle.userSide === 'heroes' && current?.hero && activeHero?.id === current?.hero) ||
+                                     (battle.userSide === 'villains' && current?.villain && activeVillain?.id === current?.villain);
             
             return (
               <button
                 key={a.type}
-                onClick={() => {
-                  console.log('🖱️ CLICK en botón:', a.type);
-                  handleAttack(a.type);
-                }}
+                onClick={() => handleAttack(a.type)}
                 disabled={actionLoading || !isOurTurn || !isCorrectCharacter}
                 className={actionLoading ? 'disabled' : ''}
               >
