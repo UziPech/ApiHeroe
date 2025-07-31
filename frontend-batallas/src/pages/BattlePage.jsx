@@ -24,7 +24,7 @@ export default function BattlePage() {
         setLoading(false);
         return;
       }
-             const res = await fetch(`https://apiheroe-qzs1phj28-uziels-projects-fa4bbf7c.vercel.app/api/battles/${battleId}`, {
+             const res = await fetch(`https://apiheroe-r9hz01hto-uziels-projects-fa4bbf7c.vercel.app/api/battles/${battleId}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -144,7 +144,7 @@ export default function BattlePage() {
     try {
       const token = localStorage.getItem('token');
       
-             const res = await fetch(`https://apiheroe-qzs1phj28-uziels-projects-fa4bbf7c.vercel.app/api/battles/${battle.id}/attack`, {
+             const res = await fetch(`https://apiheroe-r9hz01hto-uziels-projects-fa4bbf7c.vercel.app/api/battles/${battle.id}/attack`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
