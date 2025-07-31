@@ -132,9 +132,25 @@ async function performAttack(battleId, attackerId, attackType) {
     throw new Error('La batalla ya ha terminado.');
   }
 
-
-
-
+  // VERIFICAR Y ACTUALIZAR PERSONAJES ACTIVOS ANTES DE VALIDAR
+  const aliveHeroes = battle.teams.heroes.filter(h => h.hp > 0);
+  const aliveVillains = battle.teams.villains.filter(v => v.hp > 0);
+  
+  // Si el héroe activo está muerto, cambiar al primer vivo
+  const currentHero = battle.teams.heroes.find(h => h.id === battle.current.hero);
+  if (!currentHero || currentHero.hp <= 0) {
+    if (aliveHeroes.length > 0) {
+      battle.current.hero = aliveHeroes[0].id;
+    }
+  }
+  
+  // Si el villano activo está muerto, cambiar al primer vivo
+  const currentVillain = battle.teams.villains.find(v => v.id === battle.current.villain);
+  if (!currentVillain || currentVillain.hp <= 0) {
+    if (aliveVillains.length > 0) {
+      battle.current.villain = aliveVillains[0].id;
+    }
+  }
 
   const currentSide = battle.current.side;
   const attackerTeamName = currentSide === 'heroes' ? 'heroes' : 'villains';
