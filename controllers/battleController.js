@@ -289,4 +289,59 @@ export const getBattlesByUser = async (req, res) => {
   }
 };
 
+// Endpoint temporal para arreglar personajes activos
+router.post('/battles/:id/fix-active', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const battle = await battleService.getBattleById(Number(id), req.userId);
+    
+    if (!battle) {
+      return res.status(404).json({ error: 'Batalla no encontrada' });
+    }
+    
+    // Forzar actualización de personajes activos
+    let needsUpdate = false;
+    
+    // Verificar héroe activo
+    if (battle.current?.hero) {
+      const activeHero = battle.teams.heroes.find(h => h.id === battle.current.hero);
+      if (!activeHero || activeHero.hp <= 0) {
+        const aliveHeroes = battle.teams.heroes.filter(h => h.hp > 0);
+        if (aliveHeroes.length > 0) {
+          battle.current.hero = aliveHeroes[0].id;
+          needsUpdate = true;
+        }
+      }
+    }
+    
+    // Verificar villano activo
+    if (battle.current?.villain) {
+      const activeVillain = battle.teams.villains.find(v => v.id === battle.current.villain);
+      if (!activeVillain || activeVillain.hp <= 0) {
+        const aliveVillains = battle.teams.villains.filter(v => v.hp > 0);
+        if (aliveVillains.length > 0) {
+          battle.current.villain = aliveVillains[0].id;
+          needsUpdate = true;
+        }
+      }
+    }
+    
+    if (needsUpdate) {
+      await battle.save();
+      res.json({ 
+        message: 'Personajes activos actualizados',
+        current: battle.current 
+      });
+    } else {
+      res.json({ 
+        message: 'No se necesitaban actualizaciones',
+        current: battle.current 
+      });
+    }
+    
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 export default router;

@@ -46,13 +46,15 @@ export default function BattlePage() {
   useEffect(() => {
     fetchBattleState(); // Carga inicial
 
-    // Polling solo si hay batalla y no es nuestro turno y no hay ganador
+    // Polling solo si hay batalla, no es nuestro turno, no hay ganador y no estamos cargando una acción
     const intervalId = setInterval(() => {
-      fetchBattleState();
+      if (!actionLoading) { // Solo hacer polling si no estamos ejecutando una acción
+        fetchBattleState();
+      }
     }, 3000); // cada 3 segundos
 
     return () => clearInterval(intervalId);
-  }, [fetchBattleState]); // Solo dependencia de fetchBattleState
+  }, [fetchBattleState, actionLoading]); // Incluir actionLoading en las dependencias
 
   if (loading) return <div className="battle-bg">Cargando batalla...</div>;
   if (!battle) return <div className="battle-bg">No hay batalla activa.</div>;
@@ -135,6 +137,10 @@ export default function BattlePage() {
       return;
     }
     
+    // DEBUG: Mostrar qué ID estamos enviando
+    console.log('Enviando ataque con ID:', attackerId);
+    console.log('Personaje activo:', activeCharacter);
+    
     try {
       const token = localStorage.getItem('token');
       
@@ -157,6 +163,9 @@ export default function BattlePage() {
       
       // Actualizar el estado completo con la respuesta del backend
       setBattle(data.battle);
+      
+      // Pequeño delay para evitar que el polling interfiera
+      await new Promise(resolve => setTimeout(resolve, 500));
       
     } catch (e) {
       setError(

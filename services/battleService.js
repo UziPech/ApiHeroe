@@ -206,7 +206,39 @@ async function performAttack(battleId, attackerId, attackType) {
     throw new Error('La batalla ya ha terminado.');
   }
 
-  // PASO 1: VALIDACIÓN TEMPRANA - Antes de cualquier actualización
+  // PASO 1: ACTUALIZAR PERSONAJES ACTIVOS ANTES DE VALIDAR
+  let needsUpdate = false;
+  
+  // Verificar héroe activo
+  if (battle.current?.hero) {
+    const activeHero = battle.teams.heroes.find(h => h.id === battle.current.hero);
+    if (!activeHero || activeHero.hp <= 0) {
+      const aliveHeroes = battle.teams.heroes.filter(h => h.hp > 0);
+      if (aliveHeroes.length > 0) {
+        battle.current.hero = aliveHeroes[0].id;
+        needsUpdate = true;
+      }
+    }
+  }
+  
+  // Verificar villano activo
+  if (battle.current?.villain) {
+    const activeVillain = battle.teams.villains.find(v => v.id === battle.current.villain);
+    if (!activeVillain || activeVillain.hp <= 0) {
+      const aliveVillains = battle.teams.villains.filter(v => v.hp > 0);
+      if (aliveVillains.length > 0) {
+        battle.current.villain = aliveVillains[0].id;
+        needsUpdate = true;
+      }
+    }
+  }
+  
+  // Guardar cambios si se actualizaron personajes activos
+  if (needsUpdate) {
+    await battle.save();
+  }
+
+  // PASO 2: VALIDACIÓN DESPUÉS DE ACTUALIZAR
   const currentSide = battle.current.side;
   const activeCharacterId = currentSide === 'heroes' ? battle.current.hero : battle.current.villain;
   
