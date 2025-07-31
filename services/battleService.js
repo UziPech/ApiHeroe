@@ -134,6 +134,8 @@ async function performAttack(battleId, attackerId, attackType) {
 
 
 
+
+
   const currentSide = battle.current.side;
   const attackerTeamName = currentSide === 'heroes' ? 'heroes' : 'villains';
   const defenderTeamName = currentSide === 'heroes' ? 'villains' : 'heroes';

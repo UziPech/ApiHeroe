@@ -257,7 +257,7 @@ export default function BattlePage() {
           {error}
           <br />
           <span style={{ fontSize: '0.9em', color: '#fff6' }}>
-            Debug: Turno={current?.side}, UserSide={battle.userSide}, HeroId={current?.heroId}, VillainId={current?.villainId}
+            Debug: Turno={current?.side}, UserSide={battle.userSide}, HeroId={current?.hero}, VillainId={current?.villain}
           </span>
         </div>
       )}
