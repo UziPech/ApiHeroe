@@ -19,8 +19,16 @@ export default function SelectCharacterPage({ onSelect }) {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-                 const hRes = await fetch('https://apiheroe-r9fpditvm-uziels-projects-fa4bbf7c.vercel.app/api/heroes');
-         const vRes = await fetch('https://apiheroe-r9fpditvm-uziels-projects-fa4bbf7c.vercel.app/api/villains');
+                 const hRes = await fetch('https://apiheroe-r9fpditvm-uziels-projects-fa4bbf7c.vercel.app/api/heroes', {
+           headers: {
+             'Content-Type': 'application/json'
+           }
+         });
+         const vRes = await fetch('https://apiheroe-r9fpditvm-uziels-projects-fa4bbf7c.vercel.app/api/villains', {
+           headers: {
+             'Content-Type': 'application/json'
+           }
+         });
         const heroesData = await hRes.json();
         const villainsData = await vRes.json();
         setHeroes(Array.isArray(heroesData) ? heroesData.slice(0, 10) : []);
