@@ -284,13 +284,34 @@ async function performAttack(battleId, attackerId, attackType) {
     };
   }
 
-  // PASO 4: Calcular daño y actualizar HP
+  // PASO 4: Calcular daño con sistema de escudo (defensa protege la vida)
   const hpBeforeAttack = defender.hp;
-  const damage = Math.max(0, (attacker.power || 0) - (defender.defense || 0));
-  const newHp = Math.max(0, defender.hp - damage);
-  defender.hp = newHp;
+  const defenseBeforeAttack = defender.defense || 0;
+  
+  // Calcular daño base del atacante
+  const baseDamage = attacker.power || 0;
+  
+  // Sistema de escudo: primero reduce defensa, luego vida
+  let remainingDamage = baseDamage;
+  let damageToDefense = 0;
+  let damageToHp = 0;
+  
+  // Primero atacar la defensa (escudo)
+  if (defender.defense > 0 && remainingDamage > 0) {
+    damageToDefense = Math.min(defender.defense, remainingDamage);
+    defender.defense = Math.max(0, defender.defense - damageToDefense);
+    remainingDamage -= damageToDefense;
+  }
+  
+  // Si queda daño, atacar la vida
+  if (remainingDamage > 0) {
+    damageToHp = remainingDamage;
+    defender.hp = Math.max(0, defender.hp - damageToHp);
+  }
+  
+  const totalDamage = damageToDefense + damageToHp;
 
-  // PASO 5: Registrar acción con más detalles
+  // PASO 5: Registrar acción con más detalles (sistema de escudo)
   if (!battle.actions) battle.actions = [];
   battle.actions.push({
     attacker: attackerId,
@@ -300,10 +321,14 @@ async function performAttack(battleId, attackerId, attackType) {
     defenderName: defender.alias,
     defenderTeam: defenderTeamName,
     attackType,
-    damage,
+    totalDamage,
+    damageToDefense,
+    damageToHp,
     defenderHpBefore: hpBeforeAttack,
-    defenderHpAfter: newHp,
-    isDefeated: newHp <= 0
+    defenderHpAfter: defender.hp,
+    defenderDefenseBefore: defenseBeforeAttack,
+    defenderDefenseAfter: defender.defense,
+    isDefeated: defender.hp <= 0
   });
 
   // PASO 6: Actualizar estado si el defensor es derrotado
@@ -360,13 +385,34 @@ async function performAttack(battleId, attackerId, attackType) {
       const aiAttackTypes = ['basico', 'critico', 'especial'];
       const aiAttackType = aiAttackTypes[Math.floor(Math.random() * aiAttackTypes.length)];
       
-      // Calcular daño del contraataque de la IA
+      // Calcular daño del contraataque de la IA con sistema de escudo
       const aiHpBeforeAttack = playerDefender.hp;
-      const aiDamage = Math.max(0, (aiAttacker.power || 0) - (playerDefender.defense || 0));
-      const aiNewHp = Math.max(0, playerDefender.hp - aiDamage);
-      playerDefender.hp = aiNewHp;
+      const aiDefenseBeforeAttack = playerDefender.defense || 0;
+      
+      // Calcular daño base del atacante IA
+      const aiBaseDamage = aiAttacker.power || 0;
+      
+      // Sistema de escudo: primero reduce defensa, luego vida
+      let aiRemainingDamage = aiBaseDamage;
+      let aiDamageToDefense = 0;
+      let aiDamageToHp = 0;
+      
+      // Primero atacar la defensa (escudo)
+      if (playerDefender.defense > 0 && aiRemainingDamage > 0) {
+        aiDamageToDefense = Math.min(playerDefender.defense, aiRemainingDamage);
+        playerDefender.defense = Math.max(0, playerDefender.defense - aiDamageToDefense);
+        aiRemainingDamage -= aiDamageToDefense;
+      }
+      
+      // Si queda daño, atacar la vida
+      if (aiRemainingDamage > 0) {
+        aiDamageToHp = aiRemainingDamage;
+        playerDefender.hp = Math.max(0, playerDefender.hp - aiDamageToHp);
+      }
+      
+      const aiTotalDamage = aiDamageToDefense + aiDamageToHp;
 
-      // Registrar contraataque de la IA
+      // Registrar contraataque de la IA (sistema de escudo)
       battle.actions.push({
         attacker: aiAttacker.id,
         attackerName: aiAttacker.alias,
@@ -375,14 +421,18 @@ async function performAttack(battleId, attackerId, attackType) {
         defenderName: playerDefender.alias,
         defenderTeam: 'heroes',
         attackType: aiAttackType,
-        damage: aiDamage,
+        totalDamage: aiTotalDamage,
+        damageToDefense: aiDamageToDefense,
+        damageToHp: aiDamageToHp,
         defenderHpBefore: aiHpBeforeAttack,
-        defenderHpAfter: aiNewHp,
-        isDefeated: aiNewHp <= 0
+        defenderHpAfter: playerDefender.hp,
+        defenderDefenseBefore: aiDefenseBeforeAttack,
+        defenderDefenseAfter: playerDefender.defense,
+        isDefeated: playerDefender.hp <= 0
       });
 
       // Si el héroe fue derrotado por la IA
-      if (aiNewHp <= 0) {
+      if (playerDefender.hp <= 0) {
         if (!battle.defeated) battle.defeated = [];
         battle.defeated.push({
           id: playerDefender.id,

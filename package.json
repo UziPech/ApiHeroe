@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node app.js",
     "dev": "node app.js",
+    "health": "node scripts/healthCheck.js",
+    "import-data": "node scripts/importCharacters.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
