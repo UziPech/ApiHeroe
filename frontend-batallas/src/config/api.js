@@ -1,7 +1,7 @@
 // Configuración centralizada de la API
 const API_CONFIG = {
   // URL del backend - cambiar aquí cuando se haga un nuevo deploy
-  BASE_URL: 'https://apiheroe-r5vtoj1ra-uziels-projects-fa4bbf7c.vercel.app',
+  BASE_URL: 'https://apiheroe-2kraw5s14-uziels-projects-fa4bbf7c.vercel.app',
   
   // Endpoints
   ENDPOINTS: {
