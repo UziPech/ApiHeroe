@@ -121,7 +121,6 @@ export default function BattlePage() {
     try {
       const token = localStorage.getItem('token');
       // El atacante debe ser el personaje que tiene el turno según el backend
-      // El backend usa 'hero' y 'villain' en lugar de 'heroId' y 'villainId'
       attackerId = userTeam === 'heroes' ? current?.hero : current?.villain;
 
 
@@ -251,7 +250,7 @@ export default function BattlePage() {
               <button
                 key={a.type}
                 onClick={() => handleAttack(a.type)}
-                disabled={actionLoading || !isOurTurn || !isCorrectCharacter}
+                disabled={actionLoading || !isOurTurn}
                 className={actionLoading ? 'disabled' : ''}
               >
                 {a.label}

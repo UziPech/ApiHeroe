@@ -185,27 +185,9 @@ async function performAttack(battleId, attackerId, attackType) {
     };
   }
 
-  // Calcular daño según el tipo de ataque
+  // Calcular daño y actualizar HP
   const hpBeforeAttack = defender.hp;
-  let baseDamage = Math.max(0, (attacker.power || 0) - (defender.defense || 0));
-  
-  // Aplicar multiplicadores según el tipo de ataque
-  let damageMultiplier = 1;
-  switch (attackType) {
-    case 'basico':
-      damageMultiplier = 1.0; // Daño normal
-      break;
-    case 'especial':
-      damageMultiplier = 1.5; // 50% más de daño
-      break;
-    case 'critico':
-      damageMultiplier = 2.0; // 100% más de daño (el más fuerte)
-      break;
-    default:
-      damageMultiplier = 1.0; // Daño normal por defecto
-  }
-  
-  const damage = Math.round(baseDamage * damageMultiplier);
+  const damage = Math.max(0, (attacker.power || 0) - (defender.defense || 0));
   const newHp = Math.max(0, defender.hp - damage);
   defender.hp = newHp;
   
@@ -283,25 +265,7 @@ async function performAttack(battleId, attackerId, attackType) {
       
       // Calcular daño del contraataque de la IA
       const aiHpBeforeAttack = playerDefender.hp;
-      let aiBaseDamage = Math.max(0, (aiAttacker.power || 0) - (playerDefender.defense || 0));
-      
-      // Aplicar multiplicadores según el tipo de ataque de la IA
-      let aiDamageMultiplier = 1;
-      switch (aiAttackType) {
-        case 'basico':
-          aiDamageMultiplier = 1.0;
-          break;
-        case 'especial':
-          aiDamageMultiplier = 1.5;
-          break;
-        case 'critico':
-          aiDamageMultiplier = 2.0;
-          break;
-        default:
-          aiDamageMultiplier = 1.0;
-      }
-      
-      const aiDamage = Math.round(aiBaseDamage * aiDamageMultiplier);
+      const aiDamage = Math.max(0, (aiAttacker.power || 0) - (playerDefender.defense || 0));
       const aiNewHp = Math.max(0, playerDefender.hp - aiDamage);
       playerDefender.hp = aiNewHp;
 
