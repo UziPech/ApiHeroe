@@ -121,36 +121,18 @@ export default function BattlePage() {
       return;
     }
 
+    // Usar el ID del personaje activo según el backend
+    let attackerId = userTeam === 'heroes' ? current?.hero : current?.villain;
+    
     // Verificar que el personaje activo esté vivo
-    const activeCharacter = userTeam === 'heroes' ? activeHero : activeVillain;
+    const activeCharacter = userTeam === 'heroes' ? 
+      teams?.heroes?.find(h => h.id === attackerId) : 
+      teams?.villains?.find(v => v.id === attackerId);
+    
     if (!activeCharacter || activeCharacter.hp <= 0) {
-      setError('El personaje activo está derrotado. Espera a que se actualice el turno.');
+      setError(`El personaje activo (ID: ${attackerId}) está derrotado. Espera a que se actualice el turno.`);
       setActionLoading(false);
       return;
-    }
-
-    // Usar el ID del personaje activo real (vivo)
-    let attackerId;
-    if (userTeam === 'heroes') {
-      // Buscar el héroe activo que esté vivo
-      const aliveHeroes = teams?.heroes?.filter(h => h.hp > 0) || [];
-      if (aliveHeroes.length > 0) {
-        attackerId = aliveHeroes[0].id;
-      } else {
-        setError('No hay héroes vivos para atacar.');
-        setActionLoading(false);
-        return;
-      }
-    } else {
-      // Buscar el villano activo que esté vivo
-      const aliveVillains = teams?.villains?.filter(v => v.hp > 0) || [];
-      if (aliveVillains.length > 0) {
-        attackerId = aliveVillains[0].id;
-      } else {
-        setError('No hay villanos vivos para atacar.');
-        setActionLoading(false);
-        return;
-      }
     }
     
     try {
