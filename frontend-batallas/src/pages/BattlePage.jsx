@@ -118,7 +118,7 @@ export default function BattlePage() {
     const userTeam = battle?.userSide || 'heroes';
 
     if (currentTeam !== userTeam) {
-      setError(`¡No es tu turno! Actualmente es el turno de ${currentTeam === 'heroes' ? 'Héroes' : 'Villanos'}, pero tú juegas como ${userTeam === 'heroes' ? 'Héroes' : 'Villanos'}.`);
+             setError(`¡No es tu turno! Actualmente es el turno de ${currentTeam === 'heroes' ? 'Tu Equipo' : 'Rivales'}, pero tú juegas como Tu Equipo.`);
       setActionLoading(false);
       return;
     }
@@ -183,13 +183,13 @@ export default function BattlePage() {
         <div className="battle-zone player">
           <div className="circle-zone" />
           <div className={`stats ${activeHero?.hp <= 0 ? 'defeated' : ''}`}>
-            <span className="character-name">
-              {activeHero?.name || 'Héroe'}
+                       <span className="character-name">
+             {activeHero?.name || 'Equipo'}
               {activeHero?.hp <= 0 && <span style={{color: '#ff4444', fontSize: '0.8em'}}> (DERROTADO)</span>}
             </span>
-            <div style={{fontSize: '0.8em', color: '#666', marginBottom: '0.5rem'}}>
-              Héroes vivos: {aliveHeroes.length}/3
-            </div>
+                         <div style={{fontSize: '0.8em', color: '#666', marginBottom: '0.5rem'}}>
+               Equipo vivo: {aliveHeroes.length}/3
+             </div>
             <div className="stat-row">
               <span>HP:</span>
               <div className="hp-bar">
@@ -213,13 +213,13 @@ export default function BattlePage() {
         <div className="battle-zone enemy">
           <div className="circle-zone" />
           <div className={`stats ${activeVillain?.hp <= 0 ? 'defeated' : ''}`}>
-            <span className="character-name">
-              {activeVillain?.name || 'Villano'}
+                       <span className="character-name">
+             {activeVillain?.name || 'Rival'}
               {activeVillain?.hp <= 0 && <span style={{color: '#ff4444', fontSize: '0.8em'}}> (DERROTADO)</span>}
             </span>
-            <div style={{fontSize: '0.8em', color: '#666', marginBottom: '0.5rem'}}>
-              Villanos vivos: {aliveVillains.length}/3
-            </div>
+                         <div style={{fontSize: '0.8em', color: '#666', marginBottom: '0.5rem'}}>
+               Rivales vivos: {aliveVillains.length}/3
+             </div>
             <div className="stat-row">
               <span>HP:</span>
               <div className="hp-bar">
@@ -244,8 +244,8 @@ export default function BattlePage() {
       <div className="battle-status">
         {/* Mostrar de quién es el turno */}
         {!winner && (
-          <div className={`turn-indicator ${current?.side || 'heroes'}`}>
-            Turno de: {current?.side === 'villains' ? 'Villanos' : 'Héroes'}
+                     <div className={`turn-indicator ${current?.side || 'heroes'}`}>
+             Turno de: {current?.side === 'villains' ? 'Rivales' : 'Tu Equipo'}
             <span className="current-character">
               ({current?.side === 'villains' ? activeVillain?.name : activeHero?.name})
             </span>

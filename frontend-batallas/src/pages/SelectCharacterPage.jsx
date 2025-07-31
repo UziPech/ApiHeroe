@@ -9,7 +9,8 @@ export default function SelectCharacterPage({ onSelect }) {
   const [selectedVillains, setSelectedVillains] = useState([]);
   const [heroConfig, setHeroConfig] = useState({});
   const [villainConfig, setVillainConfig] = useState({});
-  const [userSide, setUserSide] = useState('heroes');
+  // Siempre jugar como héroes (equipo)
+  const userSide = 'heroes';
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -107,9 +108,9 @@ export default function SelectCharacterPage({ onSelect }) {
         body: JSON.stringify({
           heroes: selectedHeroes,
           villains: selectedVillains,
-          userSide: userSide,
-          firstHero: userSide === 'heroes' ? selectedHeroes[0] : selectedVillains[0],
-          firstVillain: userSide === 'heroes' ? selectedVillains[0] : selectedHeroes[0],
+          userSide: 'heroes',
+          firstHero: selectedHeroes[0],
+          firstVillain: selectedVillains[0],
           heroConfig,
           villainConfig
         })
@@ -126,34 +127,12 @@ export default function SelectCharacterPage({ onSelect }) {
 
   return (
     <div className="select-bg">
-      <h2>Selecciona tu equipo (3 héroes y 3 villanos)</h2>
-      <div className="side-selector">
-        <label>
-          <input
-            type="radio"
-            name="side"
-            value="heroes"
-            checked={userSide === 'heroes'}
-            onChange={(e) => setUserSide(e.target.value)}
-          />
-          Jugar como Héroe
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="side"
-            value="villains"
-            checked={userSide === 'villains'}
-            onChange={(e) => setUserSide(e.target.value)}
-          />
-          Jugar como Villano
-        </label>
-      </div>
+      <h2>Selecciona tu equipo (3 héroes) y rivales (3 villanos)</h2>
       {loading ? <div>Cargando personajes...</div> : (
         <>
           <div style={{ display: 'flex', gap: '3rem', justifyContent: 'center' }}>
             <div>
-              <h3>Héroes</h3>
+              <h3>Tu Equipo (Héroes)</h3>
               <div className="cards-container">
                 {heroes.map(hero => (
                   <div
@@ -190,7 +169,7 @@ export default function SelectCharacterPage({ onSelect }) {
               </div>
             </div>
             <div>
-              <h3>Villanos</h3>
+              <h3>Rivales (Villanos)</h3>
               <div className="cards-container">
                 {villains.map(villain => (
                   <div
