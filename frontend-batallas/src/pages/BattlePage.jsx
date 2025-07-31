@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import '../styles/battle.css';
 
 const ATTACKS = [
@@ -15,7 +15,7 @@ export default function BattlePage() {
   const [actionLoading, setActionLoading] = useState(false);
 
   // Función para cargar el estado de la batalla
-  const fetchBattleState = async () => {
+  const fetchBattleState = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       const battleId = localStorage.getItem('currentBattleId');
@@ -32,16 +32,15 @@ export default function BattlePage() {
       if (!res.ok) throw new Error('No se pudo cargar la batalla');
       const data = await res.json();
       setBattle(data);
-    } catch (e) {
+    } catch (err) {
       // Mostrar mensaje de error detallado
       setError(
-        (e.message || 'Error desconocido') +
-        (current ? ` | Turno backend: ${current.side} (ID: ${current.side === 'heroes' ? current.heroId : current.villainId})` : '')
+        (err.message || 'Error desconocido')
       );
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // Empty dependency array to avoid dependency warnings
 
   // Efecto para cargar el estado inicial y hacer polling cuando no es nuestro turno
   useEffect(() => {
@@ -49,13 +48,11 @@ export default function BattlePage() {
 
     // Polling solo si hay batalla y no es nuestro turno y no hay ganador
     const intervalId = setInterval(() => {
-      if (battle && battle.current?.side !== battle.userSide && !battle.winner) {
-        fetchBattleState();
-      }
+      fetchBattleState();
     }, 3000); // cada 3 segundos
 
     return () => clearInterval(intervalId);
-  }, [battle?.current?.side, battle?.userSide, battle?.winner]);
+  }, [fetchBattleState]); // Solo dependencia de fetchBattleState
 
   if (loading) return <div className="battle-bg">Cargando batalla...</div>;
   if (!battle) return <div className="battle-bg">No hay batalla activa.</div>;
@@ -78,6 +75,20 @@ export default function BattlePage() {
     activeVillain = teams?.villains?.find(v => v.id === current.villain);
   }
   
+  // Verificar que los personajes activos estén vivos, si no, buscar el siguiente vivo
+  if (activeHero && activeHero.hp <= 0) {
+    const aliveHeroes = teams?.heroes?.filter(h => h.hp > 0) || [];
+    if (aliveHeroes.length > 0) {
+      activeHero = aliveHeroes[0];
+    }
+  }
+  
+  if (activeVillain && activeVillain.hp <= 0) {
+    const aliveVillains = teams?.villains?.filter(v => v.hp > 0) || [];
+    if (aliveVillains.length > 0) {
+      activeVillain = aliveVillains[0];
+    }
+  }
 
 
   // Defensa mínima visual
@@ -100,7 +111,7 @@ export default function BattlePage() {
     setActionLoading(true);
     setError('');
 
-    // Calcular siempre los equipos y el turno actual
+    // Verificar que sea nuestro turno
     const currentTeam = battle?.current?.side || 'heroes';
     const userTeam = battle?.userSide || 'heroes';
 
@@ -110,13 +121,40 @@ export default function BattlePage() {
       return;
     }
 
-    let attackerId = undefined;
+    // Verificar que el personaje activo esté vivo
+    const activeCharacter = userTeam === 'heroes' ? activeHero : activeVillain;
+    if (!activeCharacter || activeCharacter.hp <= 0) {
+      setError('El personaje activo está derrotado. Espera a que se actualice el turno.');
+      setActionLoading(false);
+      return;
+    }
+
+    // Usar el ID del personaje activo real (vivo)
+    let attackerId;
+    if (userTeam === 'heroes') {
+      // Buscar el héroe activo que esté vivo
+      const aliveHeroes = teams?.heroes?.filter(h => h.hp > 0) || [];
+      if (aliveHeroes.length > 0) {
+        attackerId = aliveHeroes[0].id;
+      } else {
+        setError('No hay héroes vivos para atacar.');
+        setActionLoading(false);
+        return;
+      }
+    } else {
+      // Buscar el villano activo que esté vivo
+      const aliveVillains = teams?.villains?.filter(v => v.hp > 0) || [];
+      if (aliveVillains.length > 0) {
+        attackerId = aliveVillains[0].id;
+      } else {
+        setError('No hay villanos vivos para atacar.');
+        setActionLoading(false);
+        return;
+      }
+    }
+    
     try {
       const token = localStorage.getItem('token');
-      // El atacante debe ser el personaje que tiene el turno según el backend
-      attackerId = userTeam === 'heroes' ? current?.hero : current?.villain;
-
-
       
       const res = await fetch(`https://apiheroe.vercel.app/api/battles/${battle.id}/attack`, {
         method: 'POST',
@@ -129,10 +167,15 @@ export default function BattlePage() {
           attackType
         })
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al atacar');
       
-      setBattle(data.battle); // Solo actualizamos el estado en memoria
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Error al atacar');
+      }
+      
+      // Actualizar el estado completo con la respuesta del backend
+      setBattle(data.battle);
+      
     } catch (e) {
       setError(
         (e.message || 'Error desconocido') +
@@ -236,14 +279,15 @@ export default function BattlePage() {
             // Verificar si es nuestro turno
             const isOurTurn = current?.side === (battle.userSide || 'heroes');
             
-            const isCorrectCharacter = (battle.userSide === 'heroes' && current?.hero && activeHero?.id === current?.hero) ||
-                                     (battle.userSide === 'villains' && current?.villain && activeVillain?.id === current?.villain);
+            // Verificar que el personaje activo esté vivo
+            const activeCharacter = (battle.userSide === 'heroes' ? activeHero : activeVillain);
+            const isActiveCharacterAlive = activeCharacter && activeCharacter.hp > 0;
             
             return (
               <button
                 key={a.type}
                 onClick={() => handleAttack(a.type)}
-                disabled={actionLoading || !isOurTurn}
+                disabled={actionLoading || !isOurTurn || !isActiveCharacterAlive}
                 className={actionLoading ? 'disabled' : ''}
               >
                 {a.label}
@@ -257,7 +301,9 @@ export default function BattlePage() {
           {error}
           <br />
           <span style={{ fontSize: '0.9em', color: '#fff6' }}>
-            Debug: Turno={current?.side}, UserSide={battle.userSide}, HeroId={current?.hero}, VillainId={current?.villain}
+            Debug: Turno={current?.side}, UserSide={battle.userSide}, 
+            HéroeActivo={activeHero?.id}({activeHero?.hp}HP), 
+            VillanoActivo={activeVillain?.id}({activeVillain?.hp}HP)
           </span>
         </div>
       )}

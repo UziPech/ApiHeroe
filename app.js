@@ -20,9 +20,14 @@ connectDB();
 
 const app = express();
 
-// CORS simplificado - permitir todo en desarrollo
+// CORS específico para localhost:5174 y el nuevo frontend en Vercel
 app.use(cors({
-  origin: true,
+  origin: [
+    'http://localhost:5174', 
+    'http://localhost:5173',
+    'https://apiheroe-euvutynfj-uziels-projects-fa4bbf7c.vercel.app',
+    'https://apiheroe-m6sflzp8p-uziels-projects-fa4bbf7c.vercel.app'
+  ],
   credentials: true
 }));
 

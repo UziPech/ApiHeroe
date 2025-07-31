@@ -18,15 +18,13 @@ export default function SelectCharacterPage({ onSelect }) {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const [hRes, vRes] = await Promise.all([
-          fetch('https://apiheroe.vercel.app/api/heroes', { headers: { Authorization: token } }),
-          fetch('https://apiheroe.vercel.app/api/villains', { headers: { Authorization: token } })
-        ]);
+        const hRes = await fetch('https://apiheroe.vercel.app/api/heroes');
+        const vRes = await fetch('https://apiheroe.vercel.app/api/villains');
         const heroesData = await hRes.json();
         const villainsData = await vRes.json();
         setHeroes(Array.isArray(heroesData) ? heroesData.slice(0, 10) : []);
         setVillains(Array.isArray(villainsData) ? villainsData.slice(0, 10) : []);
-      } catch (e) {
+      } catch {
         setError('Error al cargar personajes');
       } finally {
         setLoading(false);

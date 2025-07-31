@@ -11,8 +11,8 @@ export default function LoginPage({ onLogin }) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (_e) => {
+    _e.preventDefault();
     setError('');
     setSuccess('');
     setLoading(true);
@@ -28,7 +28,7 @@ export default function LoginPage({ onLogin }) {
         let data;
         try {
           data = JSON.parse(text);
-        } catch (jsonErr) {
+        } catch {
           console.error('Respuesta no JSON (registro):', text);
           throw new Error('Respuesta inesperada del servidor (registro): ' + text);
         }
@@ -46,7 +46,7 @@ export default function LoginPage({ onLogin }) {
         let data;
         try {
           data = JSON.parse(text);
-        } catch (jsonErr) {
+        } catch {
           console.error('Respuesta no JSON (login):', text);
           throw new Error('Respuesta inesperada del servidor (login): ' + text);
         }
@@ -100,12 +100,12 @@ export default function LoginPage({ onLogin }) {
           {isRegister ? (
             <>
               ¿Ya tienes cuenta?{' '}
-              <a href="#" onClick={e => { e.preventDefault(); setIsRegister(false); setError(''); setSuccess(''); }}>Inicia sesión</a>
+              <a href="#" onClick={_e => { _e.preventDefault(); setIsRegister(false); setError(''); setSuccess(''); }}>Inicia sesión</a>
             </>
           ) : (
             <>
               ¿No tienes cuenta?{' '}
-              <a href="#" onClick={e => { e.preventDefault(); setIsRegister(true); setError(''); setSuccess(''); }}>Regístrate</a>
+              <a href="#" onClick={_e => { _e.preventDefault(); setIsRegister(true); setError(''); setSuccess(''); }}>Regístrate</a>
             </>
           )}
         </p>
