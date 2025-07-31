@@ -26,6 +26,7 @@ app.use(cors({
     // Permitir localhost y todos los subdominios de vercel.app
     const allowed = [
       'http://localhost:5173',
+      'http://localhost:5174',
       'http://localhost:3000',
       'https://apiheroe.vercel.app',
       'https://TU-FRONTEND.vercel.app' // Reemplaza por el dominio real de tu frontend si lo tienes
