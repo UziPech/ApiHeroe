@@ -24,7 +24,7 @@ export default function BattlePage() {
         setLoading(false);
         return;
       }
-      const res = await fetch(`https://apiheroe.vercel.app/api/battles/${battleId}`, {
+      const res = await fetch(`https://apiheroe-r9fpditvm-uziels-projects-fa4bbf7c.vercel.app/api/battles/${battleId}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -144,7 +144,7 @@ export default function BattlePage() {
     try {
       const token = localStorage.getItem('token');
       
-      const res = await fetch(`https://apiheroe.vercel.app/api/battles/${battle.id}/attack`, {
+             const res = await fetch(`https://apiheroe-r9fpditvm-uziels-projects-fa4bbf7c.vercel.app/api/battles/${battle.id}/attack`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -273,6 +273,15 @@ export default function BattlePage() {
             // Verificar que el personaje activo esté vivo
             const activeCharacter = (battle.userSide === 'heroes' ? activeHero : activeVillain);
             const isActiveCharacterAlive = activeCharacter && activeCharacter.hp > 0;
+            
+            // DEBUG: Mostrar información del botón
+            console.log(`Botón ${a.label}:`, {
+              actionLoading,
+              isOurTurn,
+              activeCharacter: activeCharacter ? { id: activeCharacter.id, hp: activeCharacter.hp, name: activeCharacter.name } : null,
+              isActiveCharacterAlive,
+              disabled: actionLoading || !isOurTurn || !isActiveCharacterAlive
+            });
             
             return (
               <button

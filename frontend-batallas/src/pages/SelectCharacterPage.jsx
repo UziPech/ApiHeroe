@@ -19,8 +19,8 @@ export default function SelectCharacterPage({ onSelect }) {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const hRes = await fetch('https://apiheroe.vercel.app/api/heroes');
-        const vRes = await fetch('https://apiheroe.vercel.app/api/villains');
+                 const hRes = await fetch('https://apiheroe-r9fpditvm-uziels-projects-fa4bbf7c.vercel.app/api/heroes');
+         const vRes = await fetch('https://apiheroe-r9fpditvm-uziels-projects-fa4bbf7c.vercel.app/api/villains');
         const heroesData = await hRes.json();
         const villainsData = await vRes.json();
         setHeroes(Array.isArray(heroesData) ? heroesData.slice(0, 10) : []);
@@ -99,7 +99,7 @@ export default function SelectCharacterPage({ onSelect }) {
         villainConfig
       }); // Debug
 
-      const res = await fetch('https://apiheroe.vercel.app/api/battles/team', {
+             const res = await fetch('https://apiheroe-r9fpditvm-uziels-projects-fa4bbf7c.vercel.app/api/battles/team', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
