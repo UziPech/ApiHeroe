@@ -157,7 +157,9 @@ async function performAttack(battleId, attackerId, attackType) {
 
   const attacker = attackerTeam.find(member => member.id === attackerId);
   
+  // Verificar que el atacante sea el personaje correcto según el turno actual
   const activeCharacterId = currentSide === 'heroes' ? battle.current.hero : battle.current.villain;
+  
   if (!attacker || attacker.id !== activeCharacterId) {
     throw new Error(`Turno incorrecto. Es el turno del personaje con ID ${activeCharacterId} del equipo ${currentSide}.`);
   }

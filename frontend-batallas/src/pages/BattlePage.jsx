@@ -77,12 +77,12 @@ export default function BattlePage() {
     activeVillain = teams?.villains?.find(v => v.id === current.villain);
   }
   
-  // Si no se encuentra el personaje activo o está muerto, buscar el primer personaje vivo
-  if (!activeHero || activeHero.hp <= 0) {
-    activeHero = teams?.heroes?.find(h => h.hp > 0) || teams?.heroes?.[0];
+  // Si no se encuentra el personaje activo, usar el que dice el backend
+  if (!activeHero) {
+    activeHero = teams?.heroes?.find(h => h.id === current?.hero) || teams?.heroes?.find(h => h.hp > 0) || teams?.heroes?.[0];
   }
-  if (!activeVillain || activeVillain.hp <= 0) {
-    activeVillain = teams?.villains?.find(v => v.hp > 0) || teams?.villains?.[0];
+  if (!activeVillain) {
+    activeVillain = teams?.villains?.find(v => v.id === current?.villain) || teams?.villains?.find(v => v.hp > 0) || teams?.villains?.[0];
   }
   
   // Debug adicional para entender la desincronización
@@ -108,6 +108,7 @@ export default function BattlePage() {
 
   // Realizar ataque
   const handleAttack = async (attackType) => {
+    console.log('🔄 INICIANDO ATAQUE:', attackType);
     setActionLoading(true);
     setError('');
 
@@ -129,7 +130,7 @@ export default function BattlePage() {
       attackerId = userTeam === 'heroes' ? current?.hero : current?.villain;
 
       // Debug
-      console.log('Estado ANTES del ataque:', {
+      console.log('📊 Estado ANTES del ataque:', {
         battleId: battle.id,
         attacker: attackerId,
         attackType,
@@ -140,6 +141,9 @@ export default function BattlePage() {
         villainHP: activeVillain?.hp
       });
 
+      console.log('🌐 Enviando petición a:', `https://apiheroe.vercel.app/api/battles/${battle.id}/attack`);
+      console.log('📤 Datos enviados:', { attacker: attackerId, attackType });
+      
       const res = await fetch(`https://apiheroe.vercel.app/api/battles/${battle.id}/attack`, {
         method: 'POST',
         headers: {
@@ -151,19 +155,24 @@ export default function BattlePage() {
           attackType
         })
       });
+      console.log('📥 Respuesta recibida, status:', res.status);
       const data = await res.json();
+      console.log('📥 Datos de respuesta:', data);
+      
       if (!res.ok) throw new Error(data.error || 'Error al atacar');
       
-      console.log('Respuesta del backend después del ataque:', data);
-      console.log('Estado de batalla actualizado:', data.battle);
+      console.log('✅ Respuesta del backend después del ataque:', data);
+      console.log('✅ Estado de batalla actualizado:', data.battle);
       
       setBattle(data.battle); // Solo actualizamos el estado en memoria
     } catch (e) {
+      console.log('❌ ERROR en ataque:', e);
       setError(
         (e.message || 'Error desconocido') +
         ` | Atacante enviado: ${attackerId ?? '--'}`
       );
     } finally {
+      console.log('🏁 Finalizando ataque, actionLoading:', false);
       setActionLoading(false);
     }
   };
@@ -282,7 +291,10 @@ export default function BattlePage() {
             return (
               <button
                 key={a.type}
-                onClick={() => handleAttack(a.type)}
+                onClick={() => {
+                  console.log('🖱️ CLICK en botón:', a.type);
+                  handleAttack(a.type);
+                }}
                 disabled={actionLoading || !isOurTurn || !isCorrectCharacter}
                 className={actionLoading ? 'disabled' : ''}
               >
