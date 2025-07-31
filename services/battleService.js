@@ -111,8 +111,8 @@ async function createTeamBattle({ heroes, villains, userSide, firstHero, firstVi
       alias: hero.alias,
       power: hero.power,
       level: heroConfig[hero.id]?.level || 1,
-      defense: heroConfig[hero.id]?.defense || 0,
-      maxDefense: heroConfig[hero.id]?.defense || 0,
+      defense: heroConfig[hero.id]?.defense || 30,
+      maxDefense: heroConfig[hero.id]?.defense || 30,
       hp: 100 // Inicializar vida
     })),
     villains: villainsData.map(villain => ({
@@ -121,8 +121,8 @@ async function createTeamBattle({ heroes, villains, userSide, firstHero, firstVi
       alias: villain.alias,
       power: villain.power,
       level: villainConfig[villain.id]?.level || 1,
-      defense: villainConfig[villain.id]?.defense || 0,
-      maxDefense: villainConfig[villain.id]?.defense || 0,
+      defense: villainConfig[villain.id]?.defense || 30,
+      maxDefense: villainConfig[villain.id]?.defense || 30,
       hp: 100 // Inicializar vida
     }))
   };
