@@ -6,6 +6,22 @@
   align-items: center;
   justify-content: center;
 }
+
+.waiting-turn {
+  color: #ffab40;
+  font-size: 0.9rem;
+  margin-top: 8px;
+  text-align: center;
+  font-style: italic;
+}
+
+.turn-indicator {
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  margin-bottom: 15px;
+  text-align: center;
+}
 .battle-field {
   display: flex;
   justify-content: space-between;
@@ -26,13 +42,75 @@
   box-shadow: 0 4px 24px #0004;
 }
 .stats {
-  background: #e6f2d6;
+  background: rgba(230, 242, 214, 0.9);
   border-radius: 12px;
-  padding: 0.5rem 1rem;
+  padding: 1rem;
   margin-bottom: 1rem;
-  text-align: center;
   color: #2e3d1f;
   font-size: 1rem;
+  min-width: 200px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.character-name {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.3rem 0;
+}
+
+.stat-value {
+  font-weight: bold;
+}
+
+.hp-bar {
+  flex: 1;
+  height: 12px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hp-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #ff4444, #ff0000);
+  transition: width 0.3s ease;
+}
+
+.hp-text {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  font-size: 0.8rem;
+  line-height: 12px;
+  color: #fff;
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* Estilos para personajes derrotados */
+.stats.defeated {
+  opacity: 0.6;
+  filter: grayscale(0.8);
+}
+
+.stats.defeated .character-name {
+  color: #ff4444;
+}
+
+.stats.defeated .hp-fill {
+  background: linear-gradient(90deg, #666, #444);
 }
 .battle-menu {
   display: flex;
@@ -54,4 +132,38 @@
 }
 .battle-menu button:hover {
   background: #7bb661;
+}
+
+.battle-menu button.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.battle-status {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.turn-indicator {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  color: white;
+  font-size: 1.1rem;
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.turn-indicator.heroes {
+  border-left: 4px solid #7bb661;
+}
+
+.turn-indicator.villains {
+  border-left: 4px solid #b94a48;
+}
+
+.current-character {
+  font-weight: bold;
+  color: #b2e59e;
 }

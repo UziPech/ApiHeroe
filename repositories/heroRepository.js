@@ -1,7 +1,8 @@
 import Hero from '../models/heroModel.js';
 
 async function getHeroes() {
-    return await Hero.find();
+    // Devuelve solo los primeros 10 héroes reales de la base de datos
+    return await Hero.find().limit(10);
 }
 
 async function getHeroById(id) {

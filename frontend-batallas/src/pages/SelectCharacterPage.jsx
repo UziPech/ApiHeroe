@@ -9,6 +9,7 @@ export default function SelectCharacterPage({ onSelect }) {
   const [selectedVillains, setSelectedVillains] = useState([]);
   const [heroConfig, setHeroConfig] = useState({});
   const [villainConfig, setVillainConfig] = useState({});
+  const [userSide, setUserSide] = useState('heroes');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -17,15 +18,14 @@ export default function SelectCharacterPage({ onSelect }) {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const API = 'https://apiheroe-b8h7mqk6t-uziels-projects-fa4bbf7c.vercel.app';
         const [hRes, vRes] = await Promise.all([
-          fetch(`${API}/heroes`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${API}/villains`, { headers: { Authorization: `Bearer ${token}` } })
+          fetch('https://apiheroe.vercel.app/api/heroes', { headers: { Authorization: token } }),
+          fetch('https://apiheroe.vercel.app/api/villains', { headers: { Authorization: token } })
         ]);
         const heroesData = await hRes.json();
         const villainsData = await vRes.json();
-        setHeroes(heroesData);
-        setVillains(villainsData);
+        setHeroes(Array.isArray(heroesData) ? heroesData.slice(0, 10) : []);
+        setVillains(Array.isArray(villainsData) ? villainsData.slice(0, 10) : []);
       } catch (e) {
         setError('Error al cargar personajes');
       } finally {
@@ -49,44 +49,77 @@ export default function SelectCharacterPage({ onSelect }) {
   };
 
   // Edición de nivel y defensa
-  const handleConfigChange = (id, type, field, value) => {
-    if (type === 'hero') {
-      setHeroConfig(cfg => ({ ...cfg, [id]: { ...cfg[id], [field]: Number(value) } }));
+  const handleConfigChange = (e, id, type, field) => {
+    e.stopPropagation(); // Evita que se active la selección al modificar los inputs
+    const rawValue = parseInt(e.target.value) || 0;
+    let value;
+    
+    if (field === 'level') {
+      value = Math.max(1, Math.min(3, rawValue)); // Nivel entre 1 y 3
     } else {
-      setVillainConfig(cfg => ({ ...cfg, [id]: { ...cfg[id], [field]: Number(value) } }));
+      value = Math.max(30, Math.min(70, rawValue)); // Defensa entre 30 y 70
+    }
+    
+    if (type === 'hero') {
+      setHeroConfig(cfg => ({
+        ...cfg,
+        [id]: { ...cfg[id], [field]: value }
+      }));
+    } else {
+      setVillainConfig(cfg => ({
+        ...cfg,
+        [id]: { ...cfg[id], [field]: value }
+      }));
     }
   };
 
   // Enviar selección para crear batalla
   const handleStartBattle = async () => {
     setError('');
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      setError('No hay sesión activa. Por favor, inicia sesión nuevamente.');
+      return;
+    }
+
     if (selectedHeroes.length !== 3 || selectedVillains.length !== 3) {
       setError('Debes seleccionar 3 héroes y 3 villanos');
       return;
     }
     try {
       const token = localStorage.getItem('token');
-      const API = 'https://apiheroe-b8h7mqk6t-uziels-projects-fa4bbf7c.vercel.app';
-      const res = await fetch(`${API}/battles/team`, {
+      console.log('Token:', token); // Debug
+      console.log('Datos a enviar:', {
+        heroes: selectedHeroes,
+        villains: selectedVillains,
+        userSide: 'heroes',
+        firstHero: selectedHeroes[0],
+        firstVillain: selectedVillains[0],
+        heroConfig,
+        villainConfig
+      }); // Debug
+
+      const res = await fetch('https://apiheroe.vercel.app/api/battles/team', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          'Authorization': `Bearer ${token}` // Agregamos 'Bearer' al token
         },
         body: JSON.stringify({
           heroes: selectedHeroes,
           villains: selectedVillains,
-          userSide: 'heroes',
-          firstHero: selectedHeroes[0],
-          firstVillain: selectedVillains[0],
+          userSide: userSide,
+          firstHero: userSide === 'heroes' ? selectedHeroes[0] : selectedVillains[0],
+          firstVillain: userSide === 'heroes' ? selectedVillains[0] : selectedHeroes[0],
           heroConfig,
           villainConfig
         })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error al crear batalla');
-      // Guardar el estado inicial de la batalla para la siguiente pantalla
-      localStorage.setItem('battle', JSON.stringify(data));
+      // Solo guardamos el ID de la batalla
+      localStorage.setItem('currentBattleId', data.id);
       onSelect();
     } catch (e) {
       setError(e.message);
@@ -96,6 +129,28 @@ export default function SelectCharacterPage({ onSelect }) {
   return (
     <div className="select-bg">
       <h2>Selecciona tu equipo (3 héroes y 3 villanos)</h2>
+      <div className="side-selector">
+        <label>
+          <input
+            type="radio"
+            name="side"
+            value="heroes"
+            checked={userSide === 'heroes'}
+            onChange={(e) => setUserSide(e.target.value)}
+          />
+          Jugar como Héroe
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="side"
+            value="villains"
+            checked={userSide === 'villains'}
+            onChange={(e) => setUserSide(e.target.value)}
+          />
+          Jugar como Villano
+        </label>
+      </div>
       {loading ? <div>Cargando personajes...</div> : (
         <>
           <div style={{ display: 'flex', gap: '3rem', justifyContent: 'center' }}>
@@ -110,8 +165,28 @@ export default function SelectCharacterPage({ onSelect }) {
                   >
                     <h4>{hero.name}</h4>
                     <div>Alias: {hero.alias}</div>
-                    <label>Nivel: <input type="number" min={1} max={100} value={heroConfig[hero.id]?.level || 1} onChange={e => handleConfigChange(hero.id, 'hero', 'level', e.target.value)} /></label>
-                    <label>Defensa: <input type="number" min={0} max={999} value={heroConfig[hero.id]?.defense || 0} onChange={e => handleConfigChange(hero.id, 'hero', 'defense', e.target.value)} /></label>
+                    <label>
+                      Nivel: 
+                      <input 
+                        type="number" 
+                        min={1} 
+                        max={3}
+                        value={heroConfig[hero.id]?.level || 1}
+                        onChange={e => handleConfigChange(e, hero.id, 'hero', 'level')}
+                      />
+                      <span className="input-hint">(1-3)</span>
+                    </label>
+                    <label>
+                      Defensa: 
+                      <input 
+                        type="number" 
+                        min={30} 
+                        max={70}
+                        value={heroConfig[hero.id]?.defense || 30}
+                        onChange={e => handleConfigChange(e, hero.id, 'hero', 'defense')}
+                      />
+                      <span className="input-hint">(30-70)</span>
+                    </label>
                   </div>
                 ))}
               </div>
@@ -127,8 +202,28 @@ export default function SelectCharacterPage({ onSelect }) {
                   >
                     <h4>{villain.name}</h4>
                     <div>Alias: {villain.alias}</div>
-                    <label>Nivel: <input type="number" min={1} max={100} value={villainConfig[villain.id]?.level || 1} onChange={e => handleConfigChange(villain.id, 'villain', 'level', e.target.value)} /></label>
-                    <label>Defensa: <input type="number" min={0} max={999} value={villainConfig[villain.id]?.defense || 0} onChange={e => handleConfigChange(villain.id, 'villain', 'defense', e.target.value)} /></label>
+                    <label>
+                      Nivel: 
+                      <input 
+                        type="number" 
+                        min={1} 
+                        max={3}
+                        value={villainConfig[villain.id]?.level || 1} 
+                        onChange={e => handleConfigChange(e, villain.id, 'villain', 'level')}
+                      />
+                      <span className="input-hint">(1-3)</span>
+                    </label>
+                    <label>
+                      Defensa: 
+                      <input 
+                        type="number" 
+                        min={30} 
+                        max={70} 
+                        value={villainConfig[villain.id]?.defense || 30}
+                        onChange={e => handleConfigChange(e, villain.id, 'villain', 'defense')}
+                      />
+                      <span className="input-hint">(30-70)</span>
+                    </label>
                   </div>
                 ))}
               </div>
