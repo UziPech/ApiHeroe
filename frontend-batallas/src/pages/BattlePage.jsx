@@ -69,17 +69,14 @@ export default function BattlePage() {
   let activeHero = null;
   let activeVillain = null;
   
-  // Buscar personajes activos siempre, sin importar el turno
-  // El backend usa 'hero' y 'villain' en lugar de 'heroId' y 'villainId'
+  // Buscar personajes activos según el backend
+  // El backend actualiza automáticamente cuando uno muere
   if (current?.hero) {
     activeHero = teams?.heroes?.find(h => h.id === current.hero);
   }
   if (current?.villain) {
     activeVillain = teams?.villains?.find(v => v.id === current.villain);
   }
-  
-  // NO sobrescribir el personaje activo del backend
-  // Si está muerto, el backend se encargará de cambiarlo
   
 
 

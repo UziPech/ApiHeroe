@@ -132,25 +132,7 @@ async function performAttack(battleId, attackerId, attackType) {
     throw new Error('La batalla ya ha terminado.');
   }
 
-  // ACTUALIZAR PERSONAJES ACTIVOS ANTES DE VALIDAR (importante!)
-  const aliveHeroes = battle.teams.heroes.filter(h => h.hp > 0);
-  const aliveVillains = battle.teams.villains.filter(v => v.hp > 0);
-  
-  // Asegurar que el héroe activo esté vivo
-  const currentHero = battle.teams.heroes.find(h => h.id === battle.current.hero);
-  if (!currentHero || currentHero.hp <= 0) {
-    if (aliveHeroes.length > 0) {
-      battle.current.hero = aliveHeroes[0].id;
-    }
-  }
-  
-  // Asegurar que el villano activo esté vivo
-  const currentVillain = battle.teams.villains.find(v => v.id === battle.current.villain);
-  if (!currentVillain || currentVillain.hp <= 0) {
-    if (aliveVillains.length > 0) {
-      battle.current.villain = aliveVillains[0].id;
-    }
-  }
+
 
   const currentSide = battle.current.side;
   const attackerTeamName = currentSide === 'heroes' ? 'heroes' : 'villains';
@@ -223,8 +205,20 @@ async function performAttack(battleId, attackerId, attackType) {
       team: defenderTeamName
     });
 
-    // NO actualizar el personaje activo inmediatamente
-    // Se actualizará cuando cambie el turno
+    // Actualizar el personaje activo inmediatamente si murió
+    if (defenderTeamName === 'villains') {
+      // Si murió un villano, actualizar el villano activo
+      const aliveVillains = battle.teams.villains.filter(v => v.hp > 0);
+      if (aliveVillains.length > 0) {
+        battle.current.villain = aliveVillains[0].id;
+      }
+    } else if (defenderTeamName === 'heroes') {
+      // Si murió un héroe, actualizar el héroe activo
+      const aliveHeroes = battle.teams.heroes.filter(h => h.hp > 0);
+      if (aliveHeroes.length > 0) {
+        battle.current.hero = aliveHeroes[0].id;
+      }
+    }
   }
 
   // Determinar el siguiente turno
