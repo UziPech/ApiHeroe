@@ -34,16 +34,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Middleware adicional para forzar headers en todas las respuestas
-app.use((req, res, next) => {
-  res.on('finish', () => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  });
-  next();
-});
-
 // Swagger configuration - SOLUCIÓN FINAL QUE FUNCIONA
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
@@ -211,8 +201,20 @@ app.get('/', (req, res) => {
 
 app.use('/api', heroController);
 app.use('/api', villainController);
-// Las rutas de usuarios (login y register) NO están protegidas
-app.use('/api/users', userController);
+
+// Middleware específico para rutas de usuarios para forzar CORS
+app.use('/api/users', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  next();
+}, userController);
 // Las rutas de batallas SÍ están protegidas por el middleware en battleRoutes.js
 app.use('/api/battles', battleRoutes);
 // Las rutas de duelos 1v1 SÍ están protegidas por el middleware en duelRoutes.js
