@@ -20,18 +20,15 @@ connectDB();
 
 const app = express();
 
-// CORS específico para localhost y todas las URLs de Vercel
+// CORS más permisivo para evitar problemas con URLs dinámicas de Vercel
 app.use(cors({
   origin: [
     'http://localhost:5174', 
     'http://localhost:5173',
     'https://apiheroe.vercel.app',
-    'https://apiheroe-euvutynfj-uziels-projects-fa4bbf7c.vercel.app',
-    'https://apiheroe-m6sflzp8p-uziels-projects-fa4bbf7c.vercel.app',
-    'https://apiheroe-2kraw5s14-uziels-projects-fa4bbf7c.vercel.app',
-    'https://apiheroe-r5vtoj1ra-uziels-projects-fa4bbf7c.vercel.app',
-    'https://apiheroe-r9hz01hto-uziels-projects-fa4bbf7c.vercel.app',
-    'https://apiheroe-571rn3m1d-uziels-projects-fa4bbf7c.vercel.app'
+    'https://apiheroe-jv25fpscs-uziels-projects-fa4bbf7c.vercel.app', // Frontend actual
+    /^https:\/\/apiheroe-.*\.vercel\.app$/, // Permite cualquier subdominio de apiheroe
+    /^https:\/\/.*-uziels-projects-fa4bbf7c\.vercel\.app$/ // Permite cualquier proyecto de tu cuenta
   ],
   credentials: true
 }));
