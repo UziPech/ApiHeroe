@@ -32,13 +32,19 @@ router.get('/battles', async (req, res) => {
       userId: battle.userId,
       // equipos de héroes y villanos
       teams: battle.teams,
+      // Resultado de la batalla
+      winner: battle.winner,
       // Si existen, incluye los siguientes campos (para batallas por equipos)
       userSide: battle.userSide,
       firstHero: battle.firstHero,
       firstVillain: battle.firstVillain,
       current: battle.current,
-      // Puedes agregar aquí otros campos que sí quieras mostrar
-      // winner: battle.winner, etc.
+      // Estado de la batalla
+      finished: battle.finished,
+      // Timestamp de la batalla
+      timestamp: battle.timestamp,
+      // Mensaje de la batalla
+      message: battle.message
     }));
     // Devuelve la respuesta filtrada
     res.status(200).json(battlesFiltered);
