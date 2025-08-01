@@ -22,11 +22,30 @@ const app = express();
 
 // Configuración de CORS mejorada para Vercel - DEBE IR PRIMERO Y ANTES DE TODO
 app.use((req, res, next) => {
-  // Permitir todos los orígenes
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Obtener el origin de la request
+  const origin = req.headers.origin;
+  
+  // Lista de dominios permitidos (incluye todas las URLs de Vercel)
+  const allowedOrigins = [
+    'https://apiheroe.vercel.app',
+    'https://apiheroe-17w463ssz-uziels-projects-fa4bbf7c.vercel.app',
+    'https://apiheroe-az034c71y-uziels-projects-fa4bbf7c.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:4173',
+    'http://localhost:3000'
+  ];
+  
+  // Si el origin está en la lista o es undefined (requests del servidor), permitirlo
+  if (!origin || allowedOrigins.includes(origin) || origin.includes('vercel.app')) {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  } else {
+    // Para otros casos, usar wildcard
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+  
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Credentials', 'false'); // Cambiar a false para evitar conflictos
   res.setHeader('Access-Control-Max-Age', '86400'); // 24 horas
   
   // Manejar preflight requests ANTES de cualquier otra lógica
