@@ -1,50 +1,12 @@
-# Frontend - Batallas de Superhéroes
+# React + Vite
 
-Frontend desarrollado con React + Vite para el sistema de batallas de superhéroes.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## 🚀 Deploy en Vercel
+Currently, two official plugins are available:
 
-### URLs de Producción:
-- **Frontend:** [https://tu-frontend.vercel.app](https://tu-frontend.vercel.app)
-- **Backend API:** [https://apiheroe.vercel.app](https://apiheroe.vercel.app)
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-### Características:
-- ⚛️ React 18 con Vite
-- 🎮 Sistema de batallas 3v3
-- 🔐 Autenticación de usuarios
-- 📱 Diseño responsivo
-- 🎨 Interfaz intuitiva
+## Expanding the ESLint configuration
 
-## 🛠️ Tecnologías Utilizadas
-- React 18
-- Vite (build tool)
-- CSS3 (estilos personalizados)
-- Fetch API (comunicación con backend)
-
-## 📋 Funcionalidades
-1. **Login/Registro** - Sistema de autenticación
-2. **Selección de Personajes** - Elige héroes para tu equipo
-3. **Batallas 3v3** - Combates estratégicos por turnos
-4. **Historial** - Revisa tus batallas anteriores
-
-## 🔧 Configuración API
-El frontend está configurado para usar la API en producción:
-```javascript
-BASE_URL: 'https://apiheroe.vercel.app'
-```
-
-## 🚀 Scripts Disponibles
-```bash
-npm run dev     # Servidor de desarrollo
-npm run build   # Build para producción
-npm run preview # Preview del build
-```
-
-## 📁 Estructura del Proyecto
-```
-src/
-  ├── components/     # Componentes reutilizables
-  ├── pages/         # Páginas principales
-  ├── config/        # Configuración de API
-  └── styles/        # Archivos CSS
-```
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.

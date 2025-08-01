@@ -4,10 +4,17 @@ import { buildApiUrl, getAuthHeaders } from '../config/api';
 import '../styles/battle.css';
 
 const ATTACKS = [
-  { type: 'basico', label: 'Ataque Básico' },
-  { type: 'critico', label: 'Crítico' },
-  { type: 'especial', label: 'Especial' }
+  { type: 'basico', label: 'Ataque Básico', key: 'A' },
+  { type: 'critico', label: 'Crítico', key: 'S' },
+  { type: 'especial', label: 'Especial', key: 'D' }
 ];
+
+// Mapeo de teclas para ataques
+const KEY_MAPPING = {
+  'KeyA': 'basico',
+  'KeyS': 'critico', 
+  'KeyD': 'especial'
+};
 
 export default function BattlePage({ onBack }) {
   const [battle, setBattle] = useState(null);
@@ -15,6 +22,7 @@ export default function BattlePage({ onBack }) {
   const [error, setError] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const [damagedCharacters, setDamagedCharacters] = useState(new Set()); // Para efecto de daño
+  const [pressedKey, setPressedKey] = useState(null); // Para efecto visual de tecla presionada
 
   // Función para cargar el estado de la batalla
   const fetchBattleState = useCallback(async () => {
@@ -41,6 +49,43 @@ export default function BattlePage({ onBack }) {
     }
   }, []);
 
+  // Sistema de controles de teclado
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      // Solo procesar si no estamos cargando y es nuestro turno
+      const isOurTurn = battle?.current?.side === (battle?.userSide || 'heroes');
+      const hasActiveCharacter = (battle?.userSide === 'heroes' ? 
+        (battle?.teams?.heroes?.find(h => h.id === battle?.current?.hero)?.hp > 0) :
+        (battle?.teams?.villains?.find(v => v.id === battle?.current?.villain)?.hp > 0)
+      );
+
+      if (actionLoading || !isOurTurn || !hasActiveCharacter || battle?.winner) {
+        return;
+      }
+
+      // Verificar si la tecla presionada está en nuestro mapeo
+      const attackType = KEY_MAPPING[event.code];
+      if (attackType) {
+        event.preventDefault(); // Prevenir comportamiento por defecto
+        
+        // Efecto visual de tecla presionada
+        setPressedKey(event.code);
+        setTimeout(() => setPressedKey(null), 150);
+        
+        // Ejecutar ataque
+        handleAttack(attackType);
+      }
+    };
+
+    // Agregar event listener solo cuando el componente está montado
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [battle, actionLoading]); // Dependencias para que se actualice cuando cambie el estado
+
   // Efecto para cargar el estado inicial y hacer polling cuando no es nuestro turno
   useEffect(() => {
     fetchBattleState(); // Carga inicial
@@ -57,9 +102,26 @@ export default function BattlePage({ onBack }) {
 
   // Función para volver a la selección de personajes
   const handleBackToSelection = () => {
-    localStorage.removeItem('currentBattleId'); // Limpiar la batalla actual
-    if (onBack) {
-      onBack(); // Llamar a la función de navegación hacia atrás
+    try {
+      console.log('🔙 Volviendo a selección de personajes...');
+      
+      // Limpiar la batalla actual del localStorage
+      localStorage.removeItem('currentBattleId');
+      console.log('✅ currentBattleId eliminado del localStorage');
+      
+      // Verificar si la función onBack existe
+      if (onBack && typeof onBack === 'function') {
+        console.log('✅ Llamando a onBack()');
+        onBack(); // Llamar a la función de navegación hacia atrás
+      } else {
+        console.error('❌ onBack no está definido o no es una función:', onBack);
+        // Fallback: recargar la página para ir al login
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('❌ Error en handleBackToSelection:', error);
+      // Fallback: recargar la página
+      window.location.reload();
     }
   };
 
@@ -367,6 +429,11 @@ export default function BattlePage({ onBack }) {
                   Esperando el turno del oponente...
                 </div>
               )}
+              {current?.side === (battle.userSide || 'heroes') && (
+                <div className="keyboard-hint">
+                  💡 Usa las teclas A, S, D para atacar rápidamente
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -385,10 +452,11 @@ export default function BattlePage({ onBack }) {
                 {winner === 'empate' && '🤝 ¡Empate! 🤝'}
               </div>
               <button 
-                className="back-button"
+                className="back-button victory-back-button"
                 onClick={handleBackToSelection}
+                type="button"
               >
-                🔙 Volver a Selección
+                <span>🔙 Volver a Selección</span>
               </button>
             </div>
           ) : (
@@ -414,9 +482,10 @@ export default function BattlePage({ onBack }) {
                   key={a.type}
                   onClick={() => handleAttack(a.type)}
                   disabled={actionLoading || !isOurTurn || !isActiveCharacterAlive}
-                  className={actionLoading ? 'disabled' : ''}
+                  className={`attack-button ${actionLoading ? 'disabled' : ''} ${pressedKey === `Key${a.key}` ? 'key-pressed' : ''}`}
                 >
-                  {a.label}
+                  <span className="attack-label">{a.label}</span>
+                  <span className="key-indicator">({a.key})</span>
                 </button>
               );
             })
