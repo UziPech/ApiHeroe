@@ -20,19 +20,25 @@ connectDB();
 
 const app = express();
 
-// CORS completamente abierto - SOLUCIÓN DEFINITIVA
+// Configuración de CORS mejorada para Vercel - DEBE IR PRIMERO Y ANTES DE TODO
 app.use((req, res, next) => {
+  // Permitir todos los orígenes
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Max-Age', '86400'); // 24 horas
   
+  // Manejar preflight requests ANTES de cualquier otra lógica
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
   next();
 });
+
+// Middleware para parsear JSON
+app.use(express.json());
 
 // Swagger configuration - SOLUCIÓN FINAL QUE FUNCIONA
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
@@ -177,10 +183,8 @@ app.get('/docs', (req, res) => {
     </div>
 </body>
 </html>
-    `);
+         `);
 });
-
-app.use(express.json());
 
 
 // Ruta de prueba
@@ -202,19 +206,8 @@ app.get('/', (req, res) => {
 app.use('/api', heroController);
 app.use('/api', villainController);
 
-// Middleware específico para rutas de usuarios para forzar CORS
-app.use('/api/users', (req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-  next();
-}, userController);
+// Rutas de usuarios - CORS manejado por middleware global
+app.use('/api/users', userController);
 // Las rutas de batallas SÍ están protegidas por el middleware en battleRoutes.js
 app.use('/api/battles', battleRoutes);
 // Las rutas de duelos 1v1 SÍ están protegidas por el middleware en duelRoutes.js
