@@ -265,31 +265,47 @@ async function performAttack(battleId, attackerId, attackType) {
     throw new Error(`El atacante ${attacker.alias} (ID: ${attackerId}) ya ha sido derrotado y no puede atacar.`);
   }
 
-  // PASO 3: Verificar que haya defensores vivos
-  const defender = defenderTeam.find(member => member.hp > 0);
-  if (!defender) {
-    // Victoria automática si no hay defensores
-    battle.finished = true;
-    battle.winner = currentSide;
-    battle.nextTurn = null;
-    await battle.save();
-    return {
-      current: battle.current,
-      nextTurn: battle.nextTurn,
-      defeated: battle.defeated,
-      actions: battle.actions,
-      winner: battle.winner,
-      finished: battle.finished,
-      teams: battle.teams
-    };
+  // PASO 3: Verificar que haya defensores vivos y obtener el defensor correcto
+  const activeDefenderId = currentSide === 'heroes' ? battle.current.villain : battle.current.hero;
+  const defender = defenderTeam.find(member => member.id === activeDefenderId);
+  
+  if (!defender || defender.hp <= 0) {
+    // Si el defensor activo está muerto, buscar el primer defensor vivo
+    const aliveDefender = defenderTeam.find(member => member.hp > 0);
+    if (!aliveDefender) {
+      // Victoria automática si no hay defensores
+      battle.finished = true;
+      battle.winner = currentSide;
+      battle.nextTurn = null;
+      await battle.save();
+      return {
+        current: battle.current,
+        nextTurn: battle.nextTurn,
+        defeated: battle.defeated,
+        actions: battle.actions,
+        winner: battle.winner,
+        finished: battle.finished,
+        teams: battle.teams
+      };
+    }
+    
+    // Actualizar el defensor activo
+    if (currentSide === 'heroes') {
+      battle.current.villain = aliveDefender.id;
+    } else {
+      battle.current.hero = aliveDefender.id;
+    }
   }
+  
+  // Obtener el defensor final (actualizado si era necesario)
+  const finalDefender = defenderTeam.find(member => member.id === (currentSide === 'heroes' ? battle.current.villain : battle.current.hero));
 
   // PASO 4: Calcular daño con sistema de escudo (defensa protege la vida)
-  const hpBeforeAttack = defender.hp;
-  const defenseBeforeAttack = defender.defense || 0;
+  const hpBeforeAttack = finalDefender.hp;
+  const defenseBeforeAttack = finalDefender.defense || 0;
   
-  // Calcular daño base del atacante
-  const baseDamage = attacker.power || 0;
+  // Calcular daño base del atacante (con mínimo de 1)
+  const baseDamage = Math.max(1, attacker.power || 0);
   
   // Sistema de escudo: primero reduce defensa, luego vida
   let remainingDamage = baseDamage;
@@ -297,19 +313,37 @@ async function performAttack(battleId, attackerId, attackType) {
   let damageToHp = 0;
   
   // Primero atacar la defensa (escudo)
-  if (defender.defense > 0 && remainingDamage > 0) {
-    damageToDefense = Math.min(defender.defense, remainingDamage);
-    defender.defense = Math.max(0, defender.defense - damageToDefense);
+  if (finalDefender.defense > 0 && remainingDamage > 0) {
+    damageToDefense = Math.min(finalDefender.defense, remainingDamage);
+    finalDefender.defense = Math.max(0, finalDefender.defense - damageToDefense);
     remainingDamage -= damageToDefense;
   }
   
   // Si queda daño, atacar la vida
   if (remainingDamage > 0) {
     damageToHp = remainingDamage;
-    defender.hp = Math.max(0, defender.hp - damageToHp);
+    finalDefender.hp = Math.max(0, finalDefender.hp - damageToHp);
   }
   
   const totalDamage = damageToDefense + damageToHp;
+  
+  // IMPORTANTE: Marcar el documento como modificado para que MongoDB persista los cambios
+  battle.markModified('teams');
+  
+  // Debug log para verificar el daño
+  console.log(`🎯 DAMAGE APPLIED:`, {
+    attacker: attacker.alias,
+    defender: finalDefender.alias,
+    attackType,
+    baseDamage,
+    hpBefore: hpBeforeAttack,
+    hpAfter: finalDefender.hp,
+    defenseeBefore: defenseBeforeAttack,
+    defenseAfter: finalDefender.defense,
+    totalDamage,
+    damageToDefense,
+    damageToHp
+  });
 
   // PASO 5: Registrar acción con más detalles (sistema de escudo)
   if (!battle.actions) battle.actions = [];
@@ -317,27 +351,27 @@ async function performAttack(battleId, attackerId, attackType) {
     attacker: attackerId,
     attackerName: attacker.alias,
     attackerTeam: attackerTeamName,
-    defender: defender.id,
-    defenderName: defender.alias,
+    defender: finalDefender.id,
+    defenderName: finalDefender.alias,
     defenderTeam: defenderTeamName,
     attackType,
     totalDamage,
     damageToDefense,
     damageToHp,
     defenderHpBefore: hpBeforeAttack,
-    defenderHpAfter: defender.hp,
+    defenderHpAfter: finalDefender.hp,
     defenderDefenseBefore: defenseBeforeAttack,
-    defenderDefenseAfter: defender.defense,
-    isDefeated: defender.hp <= 0
+    defenderDefenseAfter: finalDefender.defense,
+    isDefeated: finalDefender.hp <= 0
   });
 
   // PASO 6: Actualizar estado si el defensor es derrotado
-  if (defender.hp <= 0) {
+  if (finalDefender.hp <= 0) {
     if (!battle.defeated) battle.defeated = [];
     battle.defeated.push({
-      id: defender.id,
-      name: defender.name,
-      alias: defender.alias,
+      id: finalDefender.id,
+      name: finalDefender.name,
+      alias: finalDefender.alias,
       team: defenderTeamName
     });
 
@@ -347,12 +381,14 @@ async function performAttack(battleId, attackerId, attackType) {
       const aliveVillains = battle.teams.villains.filter(v => v.hp > 0);
       if (aliveVillains.length > 0) {
         battle.current.villain = aliveVillains[0].id;
+        battle.markModified('current');
       }
     } else if (defenderTeamName === 'heroes') {
       // Si murió un héroe, actualizar el héroe activo
       const aliveHeroes = battle.teams.heroes.filter(h => h.hp > 0);
       if (aliveHeroes.length > 0) {
         battle.current.hero = aliveHeroes[0].id;
+        battle.markModified('current');
       }
     }
   }
@@ -378,8 +414,19 @@ async function performAttack(battleId, attackerId, attackType) {
     // PASO 8: CONTRAATAQUE AUTOMÁTICO DE LA IA
     // Si el turno era del jugador (heroes), ahora la IA (villains) contraataca automáticamente
     if (currentSide === 'heroes' && nextAttackerTeam.length > 0 && nextDefenderTeam.length > 0) {
-      const aiAttacker = nextAttackerTeam[0]; // Primer villano vivo
-      const playerDefender = nextDefenderTeam[0]; // Primer héroe vivo
+      // Obtener el villano activo (no solo el primero)
+      const activeVillainId = battle.current.villain;
+      let aiAttacker = nextAttackerTeam.find(v => v.id === activeVillainId);
+      if (!aiAttacker || aiAttacker.hp <= 0) {
+        aiAttacker = nextAttackerTeam[0]; // Fallback al primer villano vivo
+      }
+      
+      // Obtener el héroe activo (no solo el primero)
+      const activeHeroId = battle.current.hero;
+      let playerDefender = nextDefenderTeam.find(h => h.id === activeHeroId);
+      if (!playerDefender || playerDefender.hp <= 0) {
+        playerDefender = nextDefenderTeam[0]; // Fallback al primer héroe vivo
+      }
       
       // IA elige ataque aleatorio
       const aiAttackTypes = ['basico', 'critico', 'especial'];
@@ -389,8 +436,8 @@ async function performAttack(battleId, attackerId, attackType) {
       const aiHpBeforeAttack = playerDefender.hp;
       const aiDefenseBeforeAttack = playerDefender.defense || 0;
       
-      // Calcular daño base del atacante IA
-      const aiBaseDamage = aiAttacker.power || 0;
+      // Calcular daño base del atacante IA (con mínimo de 1)
+      const aiBaseDamage = Math.max(1, aiAttacker.power || 0);
       
       // Sistema de escudo: primero reduce defensa, luego vida
       let aiRemainingDamage = aiBaseDamage;
@@ -411,6 +458,9 @@ async function performAttack(battleId, attackerId, attackType) {
       }
       
       const aiTotalDamage = aiDamageToDefense + aiDamageToHp;
+      
+      // IMPORTANTE: Marcar como modificado para persistir cambios
+      battle.markModified('teams');
 
       // Registrar contraataque de la IA (sistema de escudo)
       battle.actions.push({
@@ -440,6 +490,13 @@ async function performAttack(battleId, attackerId, attackType) {
           alias: playerDefender.alias,
           team: 'heroes'
         });
+        
+        // Actualizar héroe activo si murió
+        const aliveHeroes = battle.teams.heroes.filter(h => h.hp > 0);
+        if (aliveHeroes.length > 0) {
+          battle.current.hero = aliveHeroes[0].id;
+          battle.markModified('current');
+        }
       }
     }
 

@@ -22,20 +22,8 @@ const app = express();
 
 // Configuración de CORS mejorada para Vercel - DEBE IR PRIMERO Y ANTES DE TODO
 app.use((req, res, next) => {
-  // Permitir orígenes específicos incluyendo el frontend deployado
-  const allowedOrigins = [
-    '*',
-    'https://apiheroe-az034c71y-uziels-projects-fa4bbf7c.vercel.app',
-    'https://apiheroe.vercel.app',
-    'http://localhost:5173',
-    'http://localhost:4173'
-  ];
-  
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin || '*');
-  }
-  
+  // Permitir todos los orígenes
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
