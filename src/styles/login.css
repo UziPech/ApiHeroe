@@ -1,0 +1,287 @@
+/* Reset global para el login */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.login-bosque-bg {
+  min-height: 100vh;
+  width: 100vw;
+  background: #000000; /* Negro puro como base */
+  background-image: url('/images/login_fondo.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Efecto de fuego intenso como en las imágenes */
+.login-bosque-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(ellipse at center bottom, #ff6600 0%, transparent 60%),
+    radial-gradient(ellipse at 30% 80%, #ff3300 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 90%, #cc0000 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 50%, #ff4400 0%, transparent 70%);
+  opacity: 0.4;
+  pointer-events: none;
+  animation: intenseFlicker 2s ease-in-out infinite alternate;
+}
+
+@keyframes intenseFlicker {
+  0% { 
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  100% { 
+    opacity: 0.6;
+    transform: scale(1.02);
+  }
+}
+
+.login-container {
+  background: #0a0000; /* Negro muy oscuro inframundo */
+  border: 4px solid #ff3300;
+  border-radius: 12px;
+  padding: 3.5rem 4rem;
+  box-shadow: 
+    0 0 0 2px #ff6600,
+    0 0 0 6px #ff3300,
+    0 8px 16px rgba(255,0,0,0.4),
+    inset 0 0 20px rgba(255,0,0,0.1);
+  color: #ff3300;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  min-width: 450px;
+  max-width: 550px;
+  width: 100%;
+  margin: 0 auto;
+  font-size: 1.2rem;
+  animation: fireGlow 2s ease-in-out infinite alternate;
+  box-sizing: border-box;
+  transform: translateX(0);
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  right: -15px;
+  bottom: -15px;
+  background: 
+    radial-gradient(circle at 20% 80%, #ff6600 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, #ff3300 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, #ff4400 0%, transparent 70%);
+  border-radius: 15px;
+  z-index: -1;
+  opacity: 0.4;
+  animation: fireRing 3s ease-in-out infinite alternate;
+}
+
+@keyframes fireRing {
+  0% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.6;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes fireGlow {
+  0% {
+    box-shadow: 
+      0 0 0 2px #ff6600,
+      0 0 0 6px #ff3300,
+      0 8px 16px rgba(255,0,0,0.4),
+      inset 0 0 20px rgba(255,0,0,0.1),
+      0 0 40px rgba(255,0,0,0.3);
+  }
+  100% {
+    box-shadow: 
+      0 0 0 2px #ff6600,
+      0 0 0 6px #ff3300,
+      0 8px 16px rgba(255,0,0,0.4),
+      inset 0 0 20px rgba(255,0,0,0.1),
+      0 0 60px rgba(255,0,0,0.5),
+      0 0 80px rgba(255,0,0,0.3);
+  }
+}
+
+.logo-container {
+  margin-bottom: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-logo {
+  max-width: 200px;
+  max-height: 200px;
+  width: auto;
+  height: auto;
+  filter: drop-shadow(0 0 15px rgba(255, 102, 0, 0.6));
+  animation: logoGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes logoGlow {
+  0% {
+    filter: drop-shadow(0 0 15px rgba(255, 102, 0, 0.6));
+  }
+  100% {
+    filter: drop-shadow(0 0 25px rgba(255, 102, 0, 0.8)) drop-shadow(0 0 35px rgba(255, 51, 0, 0.4));
+  }
+}
+
+.login-form input {
+  display: block;
+  width: 100%;
+  margin: 1.8rem 0;
+  padding: 1.5rem;
+  border-radius: 6px;
+  border: 2px solid #ff3300;
+  background: #1a0000;
+  color: #ffffff;
+  font-size: 1.6rem;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: #ff6600;
+  box-shadow: 0 0 0 2px #ff3300, 0 0 15px rgba(255,0,0,0.4), 0 0 25px rgba(255,0,0,0.3);
+  transform: scale(1.02);
+  transition: all 0.3s ease;
+}
+
+.login-form button {
+  background: #ff3300;
+  color: #ffffff;
+  border: 2px solid #ff6600;
+  padding: 1.3rem 3rem;
+  border-radius: 6px;
+  font-size: 1.6rem;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 2.5rem;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.login-form button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.login-form button:hover {
+  background: #ff6600;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255,0,0,0.6), 0 0 25px rgba(255,0,0,0.4);
+}
+
+.login-form button:hover::before {
+  left: 100%;
+}
+
+.login-form button:active {
+  transform: translateY(0);
+}
+
+.error-message {
+  color: #ffbaba;
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 5px rgba(255, 186, 186, 0.5);
+}
+
+.success-message {
+  color: #b2e59e;
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 5px rgba(178, 229, 158, 0.5);
+}
+
+.login-register {
+  margin-top: 2.5rem;
+  color: #ff3300;
+  font-family: 'Courier New', monospace;
+  font-size: 1.3rem;
+  text-align: center;
+}
+
+.login-register a {
+  color: #ff6600;
+  text-decoration: none;
+  font-weight: bold;
+  border-bottom: 1px solid #ff6600;
+  transition: color 0.2s;
+}
+
+.login-register a:hover {
+  color: #ff3300;
+  text-shadow: 0 0 8px rgba(255,0,0,0.6);
+}
+
+/* Responsive design para pantallas más pequeñas */
+@media (max-width: 768px) {
+  .login-container {
+    min-width: 320px;
+    max-width: 400px;
+    padding: 2.5rem 2rem;
+    font-size: 1rem;
+  }
+  
+  .login-form input {
+    font-size: 1.4rem;
+    padding: 1.2rem;
+  }
+  
+  .login-form button {
+    font-size: 1.4rem;
+    padding: 1.1rem 2.5rem;
+  }
+  
+  .login-logo {
+    max-width: 150px;
+    max-height: 150px;
+  }
+}
